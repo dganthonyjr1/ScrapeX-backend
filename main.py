@@ -12,7 +12,7 @@ import json
 import logging
 import os
 
-from healthcare_scraper import HealthcareFacilityScraper
+from final_scraper import FinalScraper
 from ai_analysis_engine import HealthcareAIAnalyzer
 from autonomous_caller import AutonomousCallManager
 
@@ -36,7 +36,7 @@ app.add_middleware(
 )
 
 # Initialize services
-scraper = HealthcareFacilityScraper()
+scraper = FinalScraper()
 analyzer = HealthcareAIAnalyzer()
 call_manager = AutonomousCallManager()
 

@@ -24,3 +24,11 @@ INFO:     10.52.68.1:54352 - "GET / HTTP/1.1" 200 OK
 INFO:     10.178.116.1:34904 - "GET / HTTP/1.1" 200 OK
 INFO:     10.178.116.1:45584 - "GET /api/v1/scrape HTTP/1.1" 405 Method Not Allowed
 INFO:     10.178.116.1:49822 - "GET /api/v1/scrape HTTP/1.1" 405 Method Not Allowed
+INFO:     10.92.47.1:41222 - "GET /api/v1/scrape HTTP/1.1" 405 Method Not Allowed
+INFO:     10.92.47.1:38002 - "GET /api/v1/scrape HTTP/1.1" 405 Method Not Allowed
+INFO:     10.92.47.1:40836 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     10.92.47.1:40842 - "GET / HTTP/1.1" 200 OK
+INFO:     10.92.47.1:40854 - "GET / HTTP/1.1" 200 OK
+INFO:     10.92.47.1:54162 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     10.92.47.1:54174 - "GET / HTTP/1.1" 200 OK
+INFO:     10.92.47.1:54188 - "GET / HTTP/1.1" 200 OK
