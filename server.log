@@ -1,0 +1,26 @@
+WARNING:ai_analysis_engine:Failed to initialize OpenAI client: Client.__init__() got an unexpected keyword argument 'proxies'. Analysis will be limited.
+WARNING:autonomous_caller:Twilio credentials not provided. Call functionality will be simulated.
+INFO:     Started server process [3154]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51410 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51414 - "POST /api/v1/scrape HTTP/1.1" 200 OK
+INFO:healthcare_scraper:Successfully scraped https://www.mayoclinic.org
+INFO:__main__:Scrape job job_000001 completed
+INFO:     127.0.0.1:60924 - "GET /api/v1/jobs/job_000001 HTTP/1.1" 200 OK
+ERROR:ai_analysis_engine:Failed to generate call script: 'NoneType' object has no attribute 'messages'
+INFO:autonomous_caller:Call initiated to Community Health Clinic: call_e6f76104eb6c
+INFO:     127.0.0.1:60930 - "POST /api/v1/call HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39388 - "GET /api/v1/calls/statistics HTTP/1.1" 200 OK
+INFO:     10.52.68.1:51232 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.52.68.1:42854 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.52.68.1:41702 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     10.52.68.1:41704 - "GET / HTTP/1.1" 200 OK
+INFO:     10.52.68.1:41718 - "GET / HTTP/1.1" 200 OK
+INFO:     10.52.68.1:54332 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     10.52.68.1:54348 - "GET / HTTP/1.1" 200 OK
+INFO:     10.52.68.1:54352 - "GET / HTTP/1.1" 200 OK
+INFO:     10.178.116.1:34904 - "GET / HTTP/1.1" 200 OK
+INFO:     10.178.116.1:45584 - "GET /api/v1/scrape HTTP/1.1" 405 Method Not Allowed
+INFO:     10.178.116.1:49822 - "GET /api/v1/scrape HTTP/1.1" 405 Method Not Allowed
