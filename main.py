@@ -508,7 +508,8 @@ async def _process_scrape_job(job_id: str, url: str, business_type: Optional[str
         logger.info(f"Scrape job {job_id} completed")
         
         # Automatically initiate call if phone numbers found
-        phone_numbers = result.get('contact_info', {}).get('phone_numbers', [])
+        # Try both possible formats
+        phone_numbers = result.get('contact_info', {}).get('phone_numbers', []) or result.get('phone', [])
         if phone_numbers:
             first_phone = phone_numbers[0]
             business_name = result.get('business_name', 'Unknown Business')
