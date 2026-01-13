@@ -1,0 +1,383 @@
+{
+  "call_id": "call_354301a659a206df1546e71176b",
+  "call_type": "phone_call",
+  "agent_id": "agent_a6f77fcd5883ee76ce0ef1bbe3",
+  "agent_version": 0,
+  "agent_name": "Single-Prompt Agent",
+  "custom_sip_headers": {
+    "X-RetellAI-Direction": "Outbound",
+    "X-RetellAI-OrgId": "org_d3gKRe5UnEGpkIq3",
+    "X-RetellAI-CallId": "call_354301a659a206df1546e71176b",
+    "Route": "<sip:18.98.16.120;lr>"
+  },
+  "call_status": "ended",
+  "start_timestamp": 1768317095837,
+  "end_timestamp": 1768317109829,
+  "duration_ms": 13992,
+  "transcript": "User: This call is being recorded.\nAgent: Thank you for letting me know.Hi, I\u2019m calling because I noticed that ABC Medical Group has a \n",
+  "transcript_object": [
+    {
+      "role": "user",
+      "content": "This call is being recorded.",
+      "words": [
+        {
+          "word": "This ",
+          "start": 5.683,
+          "end": 6.003
+        },
+        {
+          "word": "call ",
+          "start": 6.003,
+          "end": 6.3229997000000004
+        },
+        {
+          "word": "is ",
+          "start": 6.3229997000000004,
+          "end": 6.563
+        },
+        {
+          "word": "being ",
+          "start": 6.563,
+          "end": 6.8029997
+        },
+        {
+          "word": "recorded.",
+          "start": 6.8029997,
+          "end": 7.2829997
+        }
+      ]
+    },
+    {
+      "role": "agent",
+      "content": "Thank you for letting me know.Hi, I\u2019m calling because I noticed that ABC Medical Group has a ",
+      "words": [
+        {
+          "word": "Thank ",
+          "start": 8.754,
+          "end": 9.01
+        },
+        {
+          "word": "you ",
+          "start": 9.01,
+          "end": 9.137
+        },
+        {
+          "word": "for ",
+          "start": 9.137,
+          "end": 9.277
+        },
+        {
+          "word": "letting ",
+          "start": 9.277,
+          "end": 9.544
+        },
+        {
+          "word": "me ",
+          "start": 9.544,
+          "end": 9.66
+        },
+        {
+          "word": "know.",
+          "start": 9.66,
+          "end": 10.206
+        },
+        {
+          "word": "Hi, ",
+          "start": 10.251541748046876,
+          "end": 10.553541748046875
+        },
+        {
+          "word": "I\u2019m ",
+          "start": 10.553541748046875,
+          "end": 10.716541748046875
+        },
+        {
+          "word": "calling ",
+          "start": 10.716541748046875,
+          "end": 11.087541748046876
+        },
+        {
+          "word": "because ",
+          "start": 11.087541748046876,
+          "end": 11.354541748046875
+        },
+        {
+          "word": "I ",
+          "start": 11.354541748046875,
+          "end": 11.470541748046875
+        },
+        {
+          "word": "noticed ",
+          "start": 11.470541748046875,
+          "end": 11.888541748046874
+        },
+        {
+          "word": "that ",
+          "start": 11.888541748046874,
+          "end": 12.109541748046874
+        },
+        {
+          "word": "ABC ",
+          "start": 12.109541748046874,
+          "end": 12.585541748046875
+        },
+        {
+          "word": "Medical ",
+          "start": 12.585541748046875,
+          "end": 12.980541748046875
+        },
+        {
+          "word": "Group ",
+          "start": 12.980541748046875,
+          "end": 13.258541748046875
+        },
+        {
+          "word": "has ",
+          "start": 13.258541748046875,
+          "end": 13.467541748046875
+        },
+        {
+          "word": "a ",
+          "start": 13.467541748046875,
+          "end": 13.595541748046875
+        }
+      ],
+      "metadata": {
+        "response_id": 1
+      }
+    }
+  ],
+  "transcript_with_tool_calls": [
+    {
+      "role": "user",
+      "content": "This call is being recorded.",
+      "words": [
+        {
+          "word": "This ",
+          "start": 5.683,
+          "end": 6.003
+        },
+        {
+          "word": "call ",
+          "start": 6.003,
+          "end": 6.3229997000000004
+        },
+        {
+          "word": "is ",
+          "start": 6.3229997000000004,
+          "end": 6.563
+        },
+        {
+          "word": "being ",
+          "start": 6.563,
+          "end": 6.8029997
+        },
+        {
+          "word": "recorded.",
+          "start": 6.8029997,
+          "end": 7.2829997
+        }
+      ]
+    },
+    {
+      "role": "agent",
+      "content": "Thank you for letting me know.Hi, I\u2019m calling because I noticed that ABC Medical Group has a ",
+      "words": [
+        {
+          "word": "Thank ",
+          "start": 8.754,
+          "end": 9.01
+        },
+        {
+          "word": "you ",
+          "start": 9.01,
+          "end": 9.137
+        },
+        {
+          "word": "for ",
+          "start": 9.137,
+          "end": 9.277
+        },
+        {
+          "word": "letting ",
+          "start": 9.277,
+          "end": 9.544
+        },
+        {
+          "word": "me ",
+          "start": 9.544,
+          "end": 9.66
+        },
+        {
+          "word": "know.",
+          "start": 9.66,
+          "end": 10.206
+        },
+        {
+          "word": "Hi, ",
+          "start": 10.251541748046876,
+          "end": 10.553541748046875
+        },
+        {
+          "word": "I\u2019m ",
+          "start": 10.553541748046875,
+          "end": 10.716541748046875
+        },
+        {
+          "word": "calling ",
+          "start": 10.716541748046875,
+          "end": 11.087541748046876
+        },
+        {
+          "word": "because ",
+          "start": 11.087541748046876,
+          "end": 11.354541748046875
+        },
+        {
+          "word": "I ",
+          "start": 11.354541748046875,
+          "end": 11.470541748046875
+        },
+        {
+          "word": "noticed ",
+          "start": 11.470541748046875,
+          "end": 11.888541748046874
+        },
+        {
+          "word": "that ",
+          "start": 11.888541748046874,
+          "end": 12.109541748046874
+        },
+        {
+          "word": "ABC ",
+          "start": 12.109541748046874,
+          "end": 12.585541748046875
+        },
+        {
+          "word": "Medical ",
+          "start": 12.585541748046875,
+          "end": 12.980541748046875
+        },
+        {
+          "word": "Group ",
+          "start": 12.980541748046875,
+          "end": 13.258541748046875
+        },
+        {
+          "word": "has ",
+          "start": 13.258541748046875,
+          "end": 13.467541748046875
+        },
+        {
+          "word": "a ",
+          "start": 13.467541748046875,
+          "end": 13.595541748046875
+        }
+      ],
+      "metadata": {
+        "response_id": 1
+      }
+    }
+  ],
+  "recording_url": "https://dxc03zgurdly9.cloudfront.net/6bce15abf2135620c2fa34533a4470ad6184bab8d9aff755466d48b1af2ee3ec/recording.wav",
+  "recording_multi_channel_url": "https://dxc03zgurdly9.cloudfront.net/6bce15abf2135620c2fa34533a4470ad6184bab8d9aff755466d48b1af2ee3ec/recording_multichannel.wav",
+  "public_log_url": "https://dxc03zgurdly9.cloudfront.net/6bce15abf2135620c2fa34533a4470ad6184bab8d9aff755466d48b1af2ee3ec/public.log",
+  "disconnection_reason": "user_hangup",
+  "latency": {
+    "llm": {
+      "p99": 677,
+      "min": 677,
+      "max": 677,
+      "p90": 677,
+      "num": 1,
+      "values": [
+        677
+      ],
+      "p50": 677,
+      "p95": 677
+    },
+    "e2e": {
+      "p99": 1390.000244140625,
+      "min": 1390.000244140625,
+      "max": 1390.000244140625,
+      "p90": 1390.000244140625,
+      "num": 1,
+      "values": [
+        1390.000244140625
+      ],
+      "p50": 1390.000244140625,
+      "p95": 1390.000244140625
+    },
+    "tts": {
+      "p99": 321,
+      "min": 321,
+      "max": 321,
+      "p90": 321,
+      "num": 1,
+      "values": [
+        321
+      ],
+      "p50": 321,
+      "p95": 321
+    },
+    "asr": {
+      "p99": 119.8,
+      "min": 99.99999999999909,
+      "max": 120,
+      "p90": 118,
+      "num": 3,
+      "values": [
+        120,
+        110,
+        99.99999999999909
+      ],
+      "p50": 110,
+      "p95": 119
+    }
+  },
+  "call_cost": {
+    "total_duration_unit_price": 0.2166667,
+    "product_costs": [
+      {
+        "unit_price": 0.1166667,
+        "product": "elevenlabs_tts",
+        "cost": 1.6333333
+      },
+      {
+        "unit_price": 0.075,
+        "product": "gpt_4_1",
+        "cost": 1.05
+      },
+      {
+        "unit_price": 0.025,
+        "product": "us_twilio_telephony",
+        "cost": 0.35
+      }
+    ],
+    "combined_cost": 3.0333333,
+    "total_duration_seconds": 14
+  },
+  "call_analysis": {
+    "in_voicemail": false,
+    "call_summary": "The call was initiated by the agent to discuss matters related to ABC Medical Group, but the transcript is incomplete and does not provide further details or resolution.",
+    "user_sentiment": "Neutral",
+    "custom_analysis_data": {},
+    "call_successful": false
+  },
+  "data_storage_setting": "everything",
+  "opt_in_signed_url": false,
+  "llm_token_usage": {
+    "values": [
+      185
+    ],
+    "average": 185,
+    "num_requests": 1
+  },
+  "tool_calls": [],
+  "from_number": "+16099084403",
+  "to_number": "+18562001869",
+  "direction": "outbound",
+  "telephony_identifier": {
+    "twilio_call_sid": "CAb91a86718ffd1ec36c122880da500ab5"
+  }
+}

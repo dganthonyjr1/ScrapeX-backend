@@ -5,6 +5,8 @@ FastAPI application for healthcare facility scraping, analysis, and autonomous c
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 from datetime import datetime
@@ -41,6 +43,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Initialize services
 scraper = UniversalBusinessScraper()
@@ -595,6 +600,12 @@ async def _process_analysis_job(job_id: str, business_data: Dict):
         jobs_db[job_id]['status'] = 'failed'
         jobs_db[job_id]['error'] = str(e)
         logger.error(f"Analysis job {job_id} failed: {str(e)}")
+
+
+@app.get("/chamber-partnership")
+async def chamber_partnership():
+    """Serve the Chamber & Tourism partnership page"""
+    return FileResponse("static/chamber-partnership.html")
 
 
 if __name__ == "__main__":
