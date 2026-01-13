@@ -12,17 +12,20 @@ import json
 import logging
 import os
 
-from final_scraper import FinalScraper
+from universal_scraper import UniversalBusinessScraper
+from directory_scraper import DirectoryScraper
+from integrated_scraper import IntegratedScrapingPipeline
 from ai_analysis_engine import HealthcareAIAnalyzer
 from autonomous_caller import AutonomousCallManager
+from human_ai_caller import HumanAICaller
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="ScrapeX Healthcare API",
-    description="API for scraping, analyzing, and calling healthcare facilities",
+    title="ScrapeX Universal Business API",
+    description="API for scraping, analyzing, and calling ANY business type",
     version="1.0.0"
 )
 
@@ -36,23 +39,34 @@ app.add_middleware(
 )
 
 # Initialize services
-scraper = FinalScraper()
+scraper = UniversalBusinessScraper()
+directory_scraper = DirectoryScraper()
+integrated_pipeline = IntegratedScrapingPipeline(max_workers=5)
 analyzer = HealthcareAIAnalyzer()
 call_manager = AutonomousCallManager()
+human_caller = HumanAICaller()
 
 # Request/Response models
 class ScrapeRequest(BaseModel):
-    """Request to scrape a healthcare facility"""
+    """Request to scrape any business"""
     url: str
-    facility_name: Optional[str] = None
+    business_name: Optional[str] = None
+    business_type: Optional[str] = None
 
 class BulkScrapeRequest(BaseModel):
-    """Request to scrape multiple facilities"""
+    """Request to scrape multiple businesses"""
     urls: List[str]
+    business_type: Optional[str] = None
+
+class DirectoryScrapeRequest(BaseModel):
+    """Request to scrape a business directory"""
+    directory_url: str
+    max_businesses: Optional[int] = None
+    max_pages: int = 10
 
 class AnalysisRequest(BaseModel):
-    """Request to analyze scraped facility data"""
-    facility_data: Dict
+    """Request to analyze scraped business data"""
+    business_data: Dict
 
 class CallRequest(BaseModel):
     """Request to trigger an autonomous call"""
@@ -84,11 +98,12 @@ def generate_job_id() -> str:
 async def root():
     """Root endpoint"""
     return {
-        "name": "ScrapeX Healthcare API",
+        "name": "ScrapeX Universal Business API",
         "version": "1.0.0",
         "status": "running",
         "endpoints": {
             "scrape": "/api/v1/scrape",
+            "scrape_directory": "/api/v1/scrape-directory",
             "bulk_scrape": "/api/v1/bulk-scrape",
             "analyze": "/api/v1/analyze",
             "call": "/api/v1/call",
@@ -114,12 +129,12 @@ async def health_check():
 
 
 @app.post("/api/v1/scrape")
-async def scrape_facility(request: ScrapeRequest, background_tasks: BackgroundTasks):
+async def scrape_business(request: ScrapeRequest, background_tasks: BackgroundTasks):
     """
-    Scrape a single healthcare facility website
+    Scrape a single business website (any type)
     
     Args:
-        request: ScrapeRequest with URL
+        request: ScrapeRequest with URL and optional business type
         
     Returns:
         Job ID for tracking
@@ -134,7 +149,8 @@ async def scrape_facility(request: ScrapeRequest, background_tasks: BackgroundTa
             'status': 'processing',
             'created_at': datetime.now().isoformat(),
             'url': request.url,
-            'facility_name': request.facility_name,
+            'business_name': request.business_name,
+            'business_type': request.business_type,
             'result': None,
             'error': None
         }
@@ -143,7 +159,8 @@ async def scrape_facility(request: ScrapeRequest, background_tasks: BackgroundTa
         background_tasks.add_task(
             _process_scrape_job,
             job_id,
-            request.url
+            request.url,
+            request.business_type
         )
         
         return {
@@ -160,7 +177,7 @@ async def scrape_facility(request: ScrapeRequest, background_tasks: BackgroundTa
 @app.post("/api/v1/bulk-scrape")
 async def bulk_scrape(request: BulkScrapeRequest, background_tasks: BackgroundTasks):
     """
-    Scrape multiple healthcare facilities
+    Scrape multiple businesses (any type)
     
     Args:
         request: BulkScrapeRequest with list of URLs
@@ -188,7 +205,8 @@ async def bulk_scrape(request: BulkScrapeRequest, background_tasks: BackgroundTa
         background_tasks.add_task(
             _process_bulk_scrape_job,
             job_id,
-            request.urls
+            request.urls,
+            request.business_type
         )
         
         return {
@@ -202,10 +220,57 @@ async def bulk_scrape(request: BulkScrapeRequest, background_tasks: BackgroundTa
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/v1/analyze")
-async def analyze_facility(request: AnalysisRequest, background_tasks: BackgroundTasks):
+@app.post("/api/v1/scrape-directory")
+async def scrape_directory(request: DirectoryScrapeRequest, background_tasks: BackgroundTasks):
     """
-    Analyze scraped facility data for opportunities
+    Scrape a business directory (Chamber of Commerce, tourism sites, etc.)
+    
+    Args:
+        request: DirectoryScrapeRequest with directory URL
+        
+    Returns:
+        Job ID for tracking
+    """
+    try:
+        job_id = generate_job_id()
+        
+        # Create job record
+        jobs_db[job_id] = {
+            'id': job_id,
+            'type': 'directory_scrape',
+            'status': 'processing',
+            'created_at': datetime.now().isoformat(),
+            'directory_url': request.directory_url,
+            'max_businesses': request.max_businesses,
+            'max_pages': request.max_pages,
+            'result': None,
+            'error': None
+        }
+        
+        # Process in background
+        background_tasks.add_task(
+            _process_directory_scrape_job,
+            job_id,
+            request.directory_url,
+            request.max_businesses,
+            request.max_pages
+        )
+        
+        return {
+            'job_id': job_id,
+            'status': 'processing',
+            'message': f'Directory scraping job started for {request.directory_url}'
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to start directory scrape job: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/analyze")
+async def analyze_business(request: AnalysisRequest, background_tasks: BackgroundTasks):
+    """
+    Analyze scraped business data for opportunities
     
     Args:
         request: AnalysisRequest with facility data
@@ -222,7 +287,7 @@ async def analyze_facility(request: AnalysisRequest, background_tasks: Backgroun
             'type': 'analysis',
             'status': 'processing',
             'created_at': datetime.now().isoformat(),
-            'facility_name': request.facility_data.get('facility_name'),
+            'business_name': request.business_data.get('business_name'),
             'result': None,
             'error': None
         }
@@ -231,7 +296,7 @@ async def analyze_facility(request: AnalysisRequest, background_tasks: Backgroun
         background_tasks.add_task(
             _process_analysis_job,
             job_id,
-            request.facility_data
+            request.business_data
         )
         
         return {
@@ -347,10 +412,10 @@ async def get_call_statistics():
 
 
 # Background task functions
-async def _process_scrape_job(job_id: str, url: str):
+async def _process_scrape_job(job_id: str, url: str, business_type: Optional[str] = None):
     """Process scrape job in background"""
     try:
-        result = scraper.scrape_facility_website(url)
+        result = scraper.scrape_business(url, business_type)
         jobs_db[job_id]['status'] = 'completed'
         jobs_db[job_id]['result'] = result
         logger.info(f"Scrape job {job_id} completed")
@@ -360,10 +425,10 @@ async def _process_scrape_job(job_id: str, url: str):
         logger.error(f"Scrape job {job_id} failed: {str(e)}")
 
 
-async def _process_bulk_scrape_job(job_id: str, urls: List[str]):
+async def _process_bulk_scrape_job(job_id: str, urls: List[str], business_type: Optional[str] = None):
     """Process bulk scrape job in background"""
     try:
-        results = scraper.scrape_multiple_facilities(urls)
+        results = scraper.scrape_multiple_businesses(urls)
         jobs_db[job_id]['status'] = 'completed'
         jobs_db[job_id]['results'] = results
         jobs_db[job_id]['processed'] = len(results)
@@ -374,10 +439,29 @@ async def _process_bulk_scrape_job(job_id: str, urls: List[str]):
         logger.error(f"Bulk scrape job {job_id} failed: {str(e)}")
 
 
-async def _process_analysis_job(job_id: str, facility_data: Dict):
+async def _process_directory_scrape_job(job_id: str, directory_url: str, 
+                                        max_businesses: Optional[int] = None,
+                                        max_pages: int = 10):
+    """Process directory scrape job in background"""
+    try:
+        result = integrated_pipeline.scrape_directory_and_businesses(
+            directory_url,
+            max_businesses=max_businesses,
+            max_pages=max_pages
+        )
+        jobs_db[job_id]['status'] = 'completed'
+        jobs_db[job_id]['result'] = result
+        logger.info(f"Directory scrape job {job_id} completed - found {result.get('businesses_scraped', 0)} businesses")
+    except Exception as e:
+        jobs_db[job_id]['status'] = 'failed'
+        jobs_db[job_id]['error'] = str(e)
+        logger.error(f"Directory scrape job {job_id} failed: {str(e)}")
+
+
+async def _process_analysis_job(job_id: str, business_data: Dict):
     """Process analysis job in background"""
     try:
-        result = analyzer.analyze_facility(facility_data)
+        result = analyzer.analyze_facility(business_data)
         jobs_db[job_id]['status'] = 'completed'
         jobs_db[job_id]['result'] = result
         logger.info(f"Analysis job {job_id} completed")
