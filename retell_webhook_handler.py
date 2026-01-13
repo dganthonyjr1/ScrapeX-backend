@@ -13,8 +13,9 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 # Stripe payment links
-CHAMBER_PAYMENT_LINK = "https://buy.stripe.com/7sY8wRaUt8tK4woazL"
-REGULAR_PAYMENT_LINK = "https://buy.stripe.com/28E14p4w5aBS4wo4bn"
+CHAMBER_TOURISM_PAYMENT_LINK = "https://buy.stripe.com/7sY8wRaUt8tK4woazL"  # 50% off + 15% revenue share
+HEALTHCARE_PAYMENT_LINK = "https://buy.stripe.com/28E14p4w5aBS4wo4bn"  # Pro Plan (same as general for now)
+GENERAL_BUSINESS_PAYMENT_LINK = "https://buy.stripe.com/28E14p4w5aBS4wo4bn"  # Pro Plan
 
 class RetellWebhookHandler:
     """Handles Retell AI webhook events and function calls"""
@@ -57,15 +58,18 @@ class RetellWebhookHandler:
             Response with SMS sending status
         """
         try:
-            customer_type = parameters.get("customer_type", "regular")
+            customer_type = parameters.get("customer_type", "general")
             
-            # Determine which payment link to send
-            if customer_type == "chamber":
-                payment_link = CHAMBER_PAYMENT_LINK
+            # Determine which payment link to send based on customer type
+            if customer_type == "chamber_tourism":
+                payment_link = CHAMBER_TOURISM_PAYMENT_LINK
                 link_type = "Chamber/Tourism Partnership (50% off + 15% revenue share)"
-            else:
-                payment_link = REGULAR_PAYMENT_LINK
-                link_type = "Regular Business Pro Plan"
+            elif customer_type == "healthcare":
+                payment_link = HEALTHCARE_PAYMENT_LINK
+                link_type = "Healthcare Pro Plan"
+            else:  # general or any other type
+                payment_link = GENERAL_BUSINESS_PAYMENT_LINK
+                link_type = "General Business Pro Plan"
             
             # Get customer phone number from call data
             customer_phone = call_data.get("from_number") or call_data.get("to_number")
