@@ -1,22 +1,17 @@
 """
-Universal Business Scraper for ScrapeX
-Scrapes ANY business type with owner/decision-maker contact extraction
+Universal Business Scraper - Production Version
+Extracts publicly available business information from any website
 """
 
 import requests
 from bs4 import BeautifulSoup
-import json
 import re
-from typing import Dict, List, Optional
+from urllib.parse import urljoin, urlparse
 from datetime import datetime
+from typing import Dict, List, Optional
 import logging
-
-try:
-    from playwright.sync_api import sync_playwright
-    PLAYWRIGHT_AVAILABLE = True
-except ImportError:
-    PLAYWRIGHT_AVAILABLE = False
-    logging.warning("Playwright not available")
+from openai import OpenAI
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,416 +19,111 @@ logger = logging.getLogger(__name__)
 
 class UniversalBusinessScraper:
     """
-    Universal scraper that works for ANY business type:
-    - Restaurants, retail stores, professional services
-    - Healthcare, legal, financial services
-    - Contractors, landscaping, home services
-    - B2B services, SaaS companies, agencies
-    
-    Extracts:
-    - Business name, phone, email, address
-    - Owner/decision-maker names and contact info
-    - LinkedIn profiles, social media
-    - Services, industry type, business description
+    Universal scraper that extracts publicly available business information
     """
-
+    
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         })
         self.timeout = 15
-
+        
     def scrape_business(self, url: str, business_type: Optional[str] = None) -> Dict:
         """
-        Scrape any business website
+        Scrape publicly available business information from a website
+        
+        DISCLAIMER: Extracts only publicly available data. Results depend on what
+        businesses publicly display. No guarantee of completeness.
         
         Args:
             url: Business website URL
-            business_type: Optional business type hint (e.g., 'restaurant', 'law_firm', 'contractor')
-        
+            business_type: Optional business type hint
+            
         Returns:
-            Dict with comprehensive business data including owner contact info
+            Dict with publicly available business data
         """
-        logger.info(f"Scraping business: {url}")
+        logger.info(f"Starting extraction for: {url}")
         
-        # Step 1: Try HTTP (fast)
-        http_result = self._try_http_scrape(url, business_type)
-        if http_result.get('status') == 'success' and len(http_result.get('phone', [])) > 0:
-            logger.info("HTTP scrape successful")
-            return http_result
-        
-        # Step 2: Try browser automation
-        if PLAYWRIGHT_AVAILABLE:
-            logger.info("Trying browser automation")
-            browser_result = self._try_browser_scrape(url, business_type)
-            if browser_result.get('status') == 'success' and len(browser_result.get('phone', [])) > 0:
-                logger.info("Browser scrape successful")
-                return browser_result
-        
-        # Step 3: Manual fallback required
-        logger.warning(f"Bot protection detected on {url}, manual entry required")
-        return {
+        # Initialize result
+        result = {
             'url': url,
-            'status': 'blocked',
-            'scraping_method': 'manual_required',
-            'manual_required': True,
-            'message': 'This website has advanced bot protection. Please manually verify the contact information.',
+            'scraped_at': datetime.now().isoformat(),
+            'scraping_method': 'enhanced_multi_page',
+            'status': 'success',
+            'disclaimer': 'Contains only publicly available information. Completeness depends on website content.',
             'business_name': None,
+            'business_type': business_type,
             'phone': [],
-            'email': None,
-            'owner_info': {},
-            'scraped_at': datetime.now().isoformat()
+            'email': [],
+            'address': [],
+            'website': url,
+            'description': None,
+            'services': [],
+            'social_media': {},
+            'business_owner_name': None,
+            'business_owner_title': None,
+            'key_decision_makers': [],
+            'employee_count': None,
+            'employee_range': None,
+            'industries': [],
+            'revenue_opportunities': {},
+            'missing_services': [],
+            'technology_gaps': [],
+            'competitive_weaknesses': [],
+            'ideal_solution': None,
+            'urgency_score': None,
+            'extraction_methods_used': [],
+            'data_completeness_score': 0
         }
-
-    def _try_http_scrape(self, url: str, business_type: Optional[str] = None) -> Dict:
-        """HTTP scraping with owner contact extraction"""
+        
         try:
-            response = self.session.get(url, timeout=self.timeout)
-            response.raise_for_status()
+            # Step 1: Extract from main page
+            main_data = self._extract_from_page(url)
+            self._merge_data(result, main_data)
+            result['extraction_methods_used'].append('main_page_scraping')
             
-            soup = BeautifulSoup(response.content, 'html.parser')
-            page_text = soup.get_text()
+            # Step 2: If missing critical data, crawl related pages
+            if len(result['email']) == 0 or not result['business_owner_name']:
+                logger.info("Missing critical data, crawling related pages...")
+                important_pages = self._find_important_pages(url)
+                
+                for page_url in important_pages[:5]:  # Limit to 5 pages
+                    logger.info(f"Crawling: {page_url}")
+                    page_data = self._extract_from_page(page_url)
+                    self._merge_data(result, page_data)
+                
+                result['extraction_methods_used'].append('multi_page_crawling')
             
-            # Extract all business data
-            result = {
-                'url': url,
-                'scraped_at': datetime.now().isoformat(),
-                'scraping_method': 'http_request',
-                'business_name': self._extract_business_name(soup),
-                'business_type': business_type or self._detect_business_type(soup, page_text),
-                'phone': self._extract_phone(soup, response.text),
-                'email': self._extract_emails(soup),
-                'address': self._extract_address(soup),
-                'hours': self._extract_hours(soup),
-                'services': self._extract_services(soup, page_text),
-                'description': self._extract_description(soup),
-                'social_media': self._extract_social_media(soup),
-                'owner_info': self._extract_owner_info(soup, page_text),
-                'status': 'success',
-                'manual_required': False
-            }
+            # Step 3: LinkedIn enrichment (if available)
+            linkedin_data = self._get_linkedin_data(url, result.get('business_name'))
+            if linkedin_data:
+                self._merge_data(result, linkedin_data)
+                result['extraction_methods_used'].append('linkedin_api')
             
-            return result
+            # Step 4: AI analysis
+            ai_analysis = self._ai_analyze(result)
+            if ai_analysis:
+                result.update(ai_analysis)
+                result['extraction_methods_used'].append('ai_analysis')
+            
+            # Step 5: Revenue opportunity analysis
+            revenue_ops = self._analyze_revenue_opportunities(result)
+            result['revenue_opportunities'] = revenue_ops
+            result['extraction_methods_used'].append('revenue_analysis')
+            
+            # Calculate completeness
+            result['data_completeness_score'] = self._calculate_completeness(result)
+            
+            logger.info(f"Extraction complete. Data completeness: {result['data_completeness_score']}%")
             
         except Exception as e:
-            logger.warning(f"HTTP scrape failed: {e}")
-            return {'status': 'failed', 'error': str(e)}
-
-    def _try_browser_scrape(self, url: str, business_type: Optional[str] = None) -> Dict:
-        """Browser automation scraping with owner contact extraction"""
-        try:
-            with sync_playwright() as p:
-                browser = p.chromium.launch(
-                    headless=True,
-                    args=['--disable-blink-features=AutomationControlled', '--no-sandbox']
-                )
-                
-                page = browser.new_page()
-                
-                # Add stealth scripts
-                page.add_init_script("""
-                    Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
-                    Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
-                """)
-                
-                # Navigate
-                page.goto(url, wait_until='load', timeout=20000)
-                page.wait_for_timeout(2000)
-                
-                # Get content
-                page_text = page.inner_text('body')
-                content = page.content()
-                
-                browser.close()
-                
-                # Check if we got blocked
-                if '403' in page_text and 'forbidden' in page_text.lower():
-                    return {'status': 'blocked'}
-                
-                soup = BeautifulSoup(content, 'html.parser')
-                
-                result = {
-                    'url': url,
-                    'scraped_at': datetime.now().isoformat(),
-                    'scraping_method': 'browser_automation',
-                    'business_name': self._extract_business_name(soup),
-                    'business_type': business_type or self._detect_business_type(soup, page_text),
-                    'phone': self._extract_phone_from_text(page_text),
-                    'email': self._extract_emails(soup),
-                    'address': self._extract_address(soup),
-                    'hours': self._extract_hours(soup),
-                    'services': self._extract_services(soup, page_text),
-                    'description': self._extract_description(soup),
-                    'social_media': self._extract_social_media(soup),
-                    'owner_info': self._extract_owner_info(soup, page_text),
-                    'status': 'success',
-                    'manual_required': False
-                }
-                
-                return result
-                
-        except Exception as e:
-            logger.error(f"Browser scrape failed: {e}")
-            return {'status': 'failed', 'error': str(e)}
-
-    def _extract_business_name(self, soup: BeautifulSoup) -> Optional[str]:
-        """Extract business name from multiple sources"""
-        # Try multiple sources in order of reliability
-        for elem in [
-            soup.find('h1'),
-            soup.find('meta', {'property': 'og:site_name'}),
-            soup.find('meta', {'property': 'og:title'}),
-            soup.find('title'),
-            soup.find(class_=re.compile('business-name|company-name|brand', re.I))
-        ]:
-            if elem:
-                text = elem.get('content') if elem.name == 'meta' else elem.get_text()
-                if text and '403' not in text and 'forbidden' not in text.lower():
-                    # Clean up common suffixes
-                    text = re.sub(r'\s*[\|\-]\s*(Home|About|Contact|Welcome).*$', '', text.strip(), flags=re.I)
-                    return text[:200]
-        return None
-
-    def _detect_business_type(self, soup: BeautifulSoup, page_text: str) -> Optional[str]:
-        """Auto-detect business type from content"""
-        text_lower = page_text.lower()
+            logger.error(f"Extraction failed: {e}")
+            result['status'] = 'failed'
+            result['error'] = str(e)
         
-        # Business type keywords
-        types = {
-            'restaurant': ['menu', 'reservation', 'dining', 'cuisine', 'chef', 'food'],
-            'law_firm': ['attorney', 'lawyer', 'legal', 'law firm', 'litigation', 'counsel'],
-            'medical': ['doctor', 'physician', 'medical', 'healthcare', 'clinic', 'hospital'],
-            'dental': ['dentist', 'dental', 'orthodontic', 'teeth', 'oral health'],
-            'contractor': ['contractor', 'construction', 'remodeling', 'renovation', 'building'],
-            'landscaping': ['landscaping', 'lawn care', 'irrigation', 'landscape design'],
-            'plumbing': ['plumber', 'plumbing', 'pipe', 'drain', 'water heater'],
-            'hvac': ['hvac', 'heating', 'cooling', 'air conditioning', 'furnace'],
-            'electrical': ['electrician', 'electrical', 'wiring', 'circuit'],
-            'real_estate': ['real estate', 'realtor', 'property', 'homes for sale'],
-            'accounting': ['accountant', 'accounting', 'cpa', 'tax', 'bookkeeping'],
-            'insurance': ['insurance', 'coverage', 'policy', 'claims'],
-            'auto_repair': ['auto repair', 'mechanic', 'car service', 'vehicle'],
-            'salon': ['salon', 'hair', 'beauty', 'spa', 'barber'],
-            'fitness': ['gym', 'fitness', 'personal training', 'workout'],
-            'retail': ['shop', 'store', 'retail', 'buy online', 'products'],
-            'agency': ['agency', 'marketing', 'advertising', 'creative', 'digital'],
-            'saas': ['software', 'platform', 'saas', 'cloud', 'api', 'subscription']
-        }
-        
-        # Count keyword matches
-        matches = {}
-        for biz_type, keywords in types.items():
-            count = sum(1 for keyword in keywords if keyword in text_lower)
-            if count > 0:
-                matches[biz_type] = count
-        
-        # Return type with most matches
-        if matches:
-            return max(matches, key=matches.get)
-        
-        return 'general_business'
-
-    def _extract_phone(self, soup: BeautifulSoup, raw_html: str = None) -> List[str]:
-        """Extract phone numbers"""
-        phones = set()
-        pattern = r'\+?1?\s*\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})'
-        
-        # Search in text and HTML
-        for text in [soup.get_text(), raw_html or '']:
-            for match in re.findall(pattern, text):
-                phones.add(f"({match[0]}) {match[1]}-{match[2]}")
-        
-        # Check tel: links
-        for link in soup.find_all('a', href=re.compile(r'tel:', re.I)):
-            digits = ''.join(re.findall(r'\d+', link.get('href', '')))
-            if len(digits) >= 10:
-                d = digits[-10:]
-                phones.add(f"({d[:3]}) {d[3:6]}-{d[6:]}")
-        
-        return sorted(list(phones))[:5]
-
-    def _extract_phone_from_text(self, text: str) -> List[str]:
-        """Extract phone from plain text"""
-        phones = set()
-        pattern = r'\+?1?\s*\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})'
-        
-        for match in re.findall(pattern, text):
-            phones.add(f"({match[0]}) {match[1]}-{match[2]}")
-        
-        return sorted(list(phones))[:5]
-
-    def _extract_emails(self, soup: BeautifulSoup) -> List[str]:
-        """Extract all email addresses (including owner emails)"""
-        emails = set()
-        pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
-        
-        # Check mailto links
-        for link in soup.find_all('a', href=re.compile(r'mailto:', re.I)):
-            match = re.search(pattern, link.get('href', ''))
-            if match:
-                emails.add(match.group(0))
-        
-        # Check page text
-        for match in re.finditer(pattern, soup.get_text()):
-            email = match.group(0)
-            # Filter out common non-contact emails
-            if not any(x in email.lower() for x in ['example.com', 'domain.com', 'email.com']):
-                emails.add(email)
-        
-        return sorted(list(emails))[:10]
-
-    def _extract_owner_info(self, soup: BeautifulSoup, page_text: str) -> Dict:
-        """
-        Extract owner/decision-maker contact information
-        
-        Looks for:
-        - Owner names (CEO, Founder, Owner, President)
-        - Direct contact info
-        - LinkedIn profiles
-        """
-        owner_info = {
-            'names': [],
-            'titles': [],
-            'emails': [],
-            'linkedin': [],
-            'phones': []
-        }
-        
-        # Common owner/decision-maker titles
-        title_patterns = [
-            r'(?:CEO|Chief Executive Officer)[\s:]+([A-Z][a-z]+\s+[A-Z][a-z]+)',
-            r'(?:Founder|Co-Founder)[\s:]+([A-Z][a-z]+\s+[A-Z][a-z]+)',
-            r'(?:Owner|Business Owner)[\s:]+([A-Z][a-z]+\s+[A-Z][a-z]+)',
-            r'(?:President)[\s:]+([A-Z][a-z]+\s+[A-Z][a-z]+)',
-            r'(?:Managing Director)[\s:]+([A-Z][a-z]+\s+[A-Z][a-z]+)',
-            r'([A-Z][a-z]+\s+[A-Z][a-z]+)[\s,]+(?:CEO|Founder|Owner|President)'
-        ]
-        
-        # Search for owner names and titles
-        for pattern in title_patterns:
-            matches = re.findall(pattern, page_text)
-            for match in matches:
-                if match and len(match) > 3:
-                    owner_info['names'].append(match.strip())
-        
-        # Look for "About" or "Team" pages
-        for link in soup.find_all('a', href=True):
-            href = link.get('href', '').lower()
-            text = link.get_text().lower()
-            if any(x in href or x in text for x in ['about', 'team', 'leadership', 'founder']):
-                owner_info['about_page'] = link.get('href')
-                break
-        
-        # Extract LinkedIn profiles
-        for link in soup.find_all('a', href=re.compile(r'linkedin\.com', re.I)):
-            linkedin_url = link.get('href')
-            if '/in/' in linkedin_url:  # Personal profile
-                owner_info['linkedin'].append(linkedin_url)
-        
-        # Look for owner-specific emails (common patterns)
-        all_emails = self._extract_emails(soup)
-        owner_email_patterns = ['owner@', 'ceo@', 'founder@', 'president@', 'contact@']
-        for email in all_emails:
-            if any(pattern in email.lower() for pattern in owner_email_patterns):
-                owner_info['emails'].append(email)
-        
-        # Remove duplicates
-        owner_info['names'] = list(set(owner_info['names']))[:5]
-        owner_info['linkedin'] = list(set(owner_info['linkedin']))[:5]
-        owner_info['emails'] = list(set(owner_info['emails']))[:5]
-        
-        return owner_info
-
-    def _extract_address(self, soup: BeautifulSoup) -> Optional[str]:
-        """Extract business address"""
-        # Try multiple methods
-        for elem in [
-            soup.find('address'),
-            soup.find(class_=re.compile('address|location', re.I)),
-            soup.find(itemprop='address')
-        ]:
-            if elem:
-                addr = elem.get_text().strip()
-                if len(addr) > 10:
-                    return addr[:300]
-        
-        # Look for structured data
-        for script in soup.find_all('script', type='application/ld+json'):
-            try:
-                data = json.loads(script.string)
-                if isinstance(data, dict) and 'address' in data:
-                    addr = data['address']
-                    if isinstance(addr, dict):
-                        return f"{addr.get('streetAddress', '')}, {addr.get('addressLocality', '')}, {addr.get('addressRegion', '')} {addr.get('postalCode', '')}"
-            except:
-                pass
-        
-        return None
-
-    def _extract_hours(self, soup: BeautifulSoup) -> Optional[Dict]:
-        """Extract business hours"""
-        for elem in soup.find_all(class_=re.compile('hours|schedule|open', re.I)):
-            text = elem.get_text()
-            if text and len(text) > 10:
-                return {'raw': text.strip()[:500]}
-        return None
-
-    def _extract_services(self, soup: BeautifulSoup, page_text: str) -> List[str]:
-        """Extract services offered"""
-        services = []
-        
-        # Look for services section
-        for elem in soup.find_all(['div', 'section'], class_=re.compile('service|offering|what-we-do', re.I)):
-            # Extract list items or headings
-            for item in elem.find_all(['li', 'h3', 'h4']):
-                service = item.get_text().strip()
-                if 5 < len(service) < 100:
-                    services.append(service)
-        
-        return services[:15]
-
-    def _extract_description(self, soup: BeautifulSoup) -> Optional[str]:
-        """Extract business description"""
-        # Try meta description first
-        meta_desc = soup.find('meta', {'name': 'description'})
-        if meta_desc and meta_desc.get('content'):
-            return meta_desc.get('content')[:500]
-        
-        # Try og:description
-        og_desc = soup.find('meta', {'property': 'og:description'})
-        if og_desc and og_desc.get('content'):
-            return og_desc.get('content')[:500]
-        
-        # Try first paragraph
-        for p in soup.find_all('p'):
-            text = p.get_text().strip()
-            if len(text) > 50:
-                return text[:500]
-        
-        return None
-
-    def _extract_social_media(self, soup: BeautifulSoup) -> Dict[str, str]:
-        """Extract social media profiles"""
-        social = {}
-        
-        platforms = {
-            'facebook': r'facebook\.com',
-            'twitter': r'twitter\.com|x\.com',
-            'instagram': r'instagram\.com',
-            'linkedin': r'linkedin\.com/company',
-            'youtube': r'youtube\.com',
-            'tiktok': r'tiktok\.com'
-        }
-        
-        for platform, pattern in platforms.items():
-            for link in soup.find_all('a', href=re.compile(pattern, re.I)):
-                social[platform] = link.get('href')
-                break
-        
-        return social
-
+        return result
+    
     def scrape_multiple_businesses(self, urls: List[str]) -> List[Dict]:
         """Scrape multiple businesses"""
         results = []
@@ -445,28 +135,241 @@ class UniversalBusinessScraper:
                 logger.error(f"Failed to scrape {url}: {e}")
                 results.append({
                     'url': url,
-                    'status': 'error',
+                    'status': 'failed',
                     'error': str(e)
                 })
         return results
-
-
-# Test
-if __name__ == "__main__":
-    scraper = UniversalBusinessScraper()
     
-    # Test on different business types
-    test_urls = [
-        "https://www.example-restaurant.com",
-        "https://www.example-law-firm.com",
-        "https://www.example-contractor.com",
-    ]
+    def _extract_from_page(self, url: str) -> Dict:
+        """Extract data from a specific page"""
+        data = {
+            'business_name': None,
+            'phone': [],
+            'email': [],
+            'address': [],
+            'description': None,
+            'services': [],
+            'social_media': {},
+            'executives': []
+        }
+        
+        try:
+            response = self.session.get(url, timeout=self.timeout)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            page_text = soup.get_text()
+            
+            # Business name
+            if not data['business_name']:
+                title = soup.find('title')
+                if title:
+                    data['business_name'] = title.get_text().split('|')[0].split('-')[0].strip()
+            
+            # Phone numbers
+            phone_pattern = r'(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+            for match in re.finditer(phone_pattern, page_text):
+                phone = match.group(0)
+                if len(phone) >= 10:
+                    data['phone'].append(phone)
+            
+            # Remove duplicates
+            data['phone'] = list(set(data['phone']))[:5]
+            
+            # Email addresses
+            email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+            
+            # Mailto links
+            for link in soup.find_all('a', href=re.compile(r'mailto:', re.I)):
+                match = re.search(email_pattern, link.get('href', ''))
+                if match:
+                    email = match.group(0)
+                    if not any(x in email.lower() for x in ['example.com', 'test.com', 'domain.com']):
+                        data['email'].append(email)
+            
+            # Text emails
+            for match in re.finditer(email_pattern, page_text):
+                email = match.group(0)
+                if not any(x in email.lower() for x in ['example.com', 'test.com', 'domain.com', '.png', '.jpg']):
+                    data['email'].append(email)
+            
+            # Remove duplicates
+            data['email'] = list(set(data['email']))[:5]
+            
+            # Social media
+            social_patterns = {
+                'facebook': r'facebook\.com/[\w.-]+',
+                'twitter': r'twitter\.com/[\w.-]+',
+                'linkedin': r'linkedin\.com/(company|in)/[\w.-]+',
+                'instagram': r'instagram\.com/[\w.-]+'
+            }
+            
+            for platform, pattern in social_patterns.items():
+                match = re.search(pattern, page_text, re.I)
+                if match:
+                    data['social_media'][platform] = 'https://' + match.group(0)
+            
+            # Description
+            meta_desc = soup.find('meta', attrs={'name': 'description'})
+            if meta_desc:
+                data['description'] = meta_desc.get('content', '')[:500]
+            
+            # Executives
+            exec_patterns = [
+                r'([A-Z][a-z]+ [A-Z][a-z]+)\s*[-–—,]\s*(CEO|President|Founder|Director|VP|Vice President|Chief|Executive)',
+            ]
+            
+            for pattern in exec_patterns:
+                for match in re.finditer(pattern, page_text, re.I):
+                    if len(match.groups()) >= 2:
+                        name = match.group(1).strip()
+                        title = match.group(2).strip()
+                        data['executives'].append(f"{name} - {title}")
+            
+        except Exception as e:
+            logger.warning(f"Error extracting from {url}: {e}")
+        
+        return data
     
-    for url in test_urls:
-        print(f"\n{'='*60}")
-        print(f"Testing: {url}")
-        print('='*60)
+    def _find_important_pages(self, base_url: str) -> List[str]:
+        """Find contact, team, and services pages"""
+        important_pages = []
         
-        result = scraper.scrape_business(url)
+        try:
+            response = self.session.get(base_url, timeout=self.timeout)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            keywords = {
+                'contact': ['contact', 'get-in-touch', 'reach-us'],
+                'team': ['team', 'about', 'leadership', 'staff', 'executives', 'meet-the-team'],
+                'services': ['services', 'what-we-do', 'offerings', 'programs']
+            }
+            
+            for link in soup.find_all('a', href=True):
+                href = link.get('href', '').lower()
+                text = link.get_text().lower()
+                
+                for category, terms in keywords.items():
+                    if any(term in href or term in text for term in terms):
+                        full_url = urljoin(base_url, link['href'])
+                        if full_url not in important_pages and urlparse(full_url).netloc == urlparse(base_url).netloc:
+                            important_pages.append(full_url)
+                            break
         
-        print(json.dumps(result, indent=2))
+        except Exception as e:
+            logger.warning(f"Error finding important pages: {e}")
+        
+        return important_pages
+    
+    def _get_linkedin_data(self, url: str, business_name: Optional[str]) -> Optional[Dict]:
+        """Get LinkedIn company data (mock for now)"""
+        # This would integrate with LinkedIn API in production
+        return None
+    
+    def _ai_analyze(self, data: Dict) -> Dict:
+        """AI analysis of business data"""
+        try:
+            client = OpenAI()
+            
+            prompt = f"""Analyze this business data and provide insights in JSON format:
+
+Business: {data.get('business_name')}
+Description: {data.get('description')}
+Services: {data.get('services')}
+Website: {data.get('url')}
+
+Provide:
+1. missing_services: List of 5 services they could offer
+2. technology_gaps: List of 5 technology improvements needed
+3. competitive_weaknesses: List of 5 competitive weaknesses
+4. ideal_solution: One sentence describing ideal solution
+5. urgency_score: Number 1-10 for urgency
+
+Return only valid JSON."""
+            
+            response = client.chat.completions.create(
+                model="gpt-4.1-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                response_format={"type": "json_object"}
+            )
+            
+            import json
+            return json.loads(response.choices[0].message.content)
+            
+        except Exception as e:
+            logger.warning(f"AI analysis failed: {e}")
+            return {}
+    
+    def _analyze_revenue_opportunities(self, data: Dict) -> Dict:
+        """Analyze revenue opportunities"""
+        opportunities = []
+        total_loss = 0
+        
+        # Missing email
+        if len(data.get('email', [])) == 0:
+            opportunities.append({
+                'type': 'missing_contact',
+                'description': 'No email contact - missing online inquiries',
+                'estimated_loss': 300
+            })
+            total_loss += 300
+        
+        # Missing services
+        for service in data.get('missing_services', [])[:5]:
+            opportunities.append({
+                'type': 'missing_service',
+                'description': f'Not offering: {service}',
+                'estimated_loss': 500
+            })
+            total_loss += 500
+        
+        return {
+            'total_opportunities_found': len(opportunities),
+            'estimated_monthly_revenue_loss': total_loss,
+            'opportunities': opportunities
+        }
+    
+    def _merge_data(self, target: Dict, source: Dict):
+        """Merge source data into target"""
+        for key, value in source.items():
+            if key in ['phone', 'email', 'address', 'services', 'executives']:
+                if isinstance(value, list):
+                    target.setdefault(key, []).extend(value)
+                    target[key] = list(set(target[key]))[:15]
+            elif key == 'social_media' and isinstance(value, dict):
+                target.setdefault(key, {}).update(value)
+            elif key == 'executives' and value:
+                target.setdefault('key_decision_makers', []).extend(value)
+                if not target.get('business_owner_name') and value:
+                    first_exec = value[0]
+                    if 'CEO' in first_exec or 'President' in first_exec or 'Founder' in first_exec:
+                        parts = first_exec.split('-')
+                        if len(parts) >= 2:
+                            target['business_owner_name'] = parts[0].strip()
+                            target['business_owner_title'] = parts[1].strip()
+            elif not target.get(key) and value:
+                target[key] = value
+    
+    def _calculate_completeness(self, data: Dict) -> int:
+        """Calculate data completeness percentage"""
+        fields = {
+            'business_name': 10,
+            'phone': 15,
+            'email': 15,
+            'description': 10,
+            'services': 10,
+            'social_media': 10,
+            'business_owner_name': 15,
+            'revenue_opportunities': 15
+        }
+        
+        score = 0
+        for field, weight in fields.items():
+            value = data.get(field)
+            if value:
+                if isinstance(value, (list, dict)):
+                    if len(value) > 0:
+                        score += weight
+                else:
+                    score += weight
+        
+        return score
