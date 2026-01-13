@@ -44,9 +44,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 # Initialize services
 scraper = UniversalBusinessScraper()
 directory_scraper = DirectoryScraper()
@@ -605,7 +602,15 @@ async def _process_analysis_job(job_id: str, business_data: Dict):
 @app.get("/chamber-partnership")
 async def chamber_partnership():
     """Serve the Chamber & Tourism partnership page"""
-    return FileResponse("static/chamber-partnership.html")
+    import os
+    file_path = os.path.join(os.path.dirname(__file__), "static", "chamber-partnership.html")
+    return FileResponse(file_path)
+
+# Mount static files after all routes
+try:
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+except:
+    pass  # Static files may not exist in all environments
 
 
 if __name__ == "__main__":
