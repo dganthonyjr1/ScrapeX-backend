@@ -12,6 +12,7 @@ from typing import Dict, List, Optional
 import logging
 from openai import OpenAI
 import os
+from dns_fix import configure_dns_session, test_dns_resolution
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,11 +24,9 @@ class UniversalBusinessScraper:
     """
     
     def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        })
-        self.timeout = 15
+        # Use DNS-fixed session with retry logic
+        self.session = configure_dns_session()
+        self.timeout = 30
         
     def scrape_business(self, url: str, business_type: Optional[str] = None) -> Dict:
         """
