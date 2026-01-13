@@ -133,6 +133,48 @@
             margin-top: 20px;
         }
         
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #fff;
+            color: #ff006e;
+        }
+        
+        .btn-primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid #fff;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
         .highlight {
             color: #ff006e;
             font-weight: 600;
@@ -298,11 +340,24 @@
             <h2>Next Steps: Schedule a 15-Minute Walkthrough</h2>
             <p>We invite you to schedule a quick 15-minute walkthrough to see how the ScrapeX partnership program can support your organization and members. We will show you a live demo of the platform, answer any questions you have, and discuss how we can tailor the program to meet your specific needs.</p>
             
+            <div class="button-group">
+                <a href="mailto:team@suddenimpactagency.io?subject=Chamber%20Partnership%20Inquiry&body=Hello%2C%0A%0AI%20am%20interested%20in%20learning%20more%20about%20the%20ScrapeX%20Chamber%20Partnership%20Program.%0A%0AOrganization%20Name%3A%20%0AContact%20Name%3A%20%0AEmail%3A%20%0APhone%3A%20%0A%0AThank%20you%21" class="btn btn-secondary">Contact Our Team</a>
+                <a href="#" id="partnershipCheckout" class="btn btn-primary">Start Partnership Now</a>
+            </div>
+            
             <div class="contact-info">
                 <p>Jenn Esposito</p>
                 <p>Sudden Impact Agency</p>
                 <p>suddenimpactagency.io</p>
             </div>
+            
+            <script>
+                // Placeholder for Stripe checkout link
+                document.getElementById('partnershipCheckout').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Stripe checkout link will be added here. Please contact team@suddenimpactagency.io to get started.');
+                });
+            </script>
         </div>
     </div>
 </body>
