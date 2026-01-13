@@ -13,6 +13,7 @@ from datetime import datetime
 import json
 import logging
 import os
+import requests
 
 from universal_scraper import UniversalBusinessScraper
 from directory_scraper import DirectoryScraper
@@ -673,3 +674,64 @@ except:
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+@app.post("/api/v1/import-urls")
+async def import_urls(google_sheets_url: Optional[str] = None):
+    """
+    Import URLs from Google Sheets
+    
+    Args:
+        google_sheets_url: Google Sheets share URL
+        
+    Returns:
+        List of extracted URLs
+    """
+    try:
+        import re
+        
+        if not google_sheets_url:
+            raise HTTPException(status_code=400, detail="Google Sheets URL required")
+        
+        # Extract sheet ID
+        match = re.search(r'/d/([a-zA-Z0-9-_]+)', google_sheets_url)
+        if not match:
+            raise HTTPException(status_code=400, detail="Invalid Google Sheets URL")
+        
+        sheet_id = match.group(1)
+        csv_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv'
+        
+        # Fetch CSV
+        response = requests.get(csv_url, timeout=10)
+        response.raise_for_status()
+        
+        # Extract URLs
+        urls = []
+        for line in response.text.split('\n'):
+            # Find all URLs in the line
+            found_urls = re.findall(r'https?://[^\s,;"\'<>]+', line)
+            urls.extend(found_urls)
+        
+        # Remove duplicates and clean
+        urls = list(set([url.strip() for url in urls if url.strip()]))
+        
+        logger.info(f"Imported {len(urls)} URLs from Google Sheets")
+        
+        return {
+            'success': True,
+            'urls': urls,
+            'count': len(urls),
+            'message': f'Successfully imported {len(urls)} URLs'
+        }
+    
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 404:
+            raise HTTPException(
+                status_code=400,
+                detail="Google Sheet not found or not publicly accessible. Make sure it's set to 'Anyone with the link can view'"
+            )
+        raise HTTPException(status_code=400, detail=f"Failed to fetch Google Sheet: {str(e)}")
+    
+    except Exception as e:
+        logger.error(f"Failed to import URLs: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
