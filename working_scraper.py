@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class UniversalBusinessScraper:
+class WorkingBusinessScraper:
     """
     Scraper that actually extracts data from websites
     """
