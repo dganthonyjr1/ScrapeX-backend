@@ -53,7 +53,7 @@ In no event shall Sudden Impact Agency, nor its directors, employees, partners, 
 
 ## 11. Governing Law
 
-These Terms shall be governed and construed in accordance with the laws of the State of [Your State], without regard to its conflict of law provisions.
+These Terms shall be governed and construed in accordance with the laws of the State of New Jersey, without regard to its conflict of law provisions.
 
 ## 12. Changes to Terms
 
@@ -61,4 +61,4 @@ We reserve the right, at our sole discretion, to modify or replace these Terms a
 
 ## 13. Contact Us
 
-If you have any questions about these Terms, please contact us at [Your Contact Email].
+If you have any questions about these Terms, please contact us at support@suddenimpactagency.io.
