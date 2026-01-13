@@ -317,10 +317,33 @@ class UniversalBusinessScraper:
         """Generate analysis insights about the scraped data"""
         insights = []
         
-        # Phone analysis
+        # Phone analysis with detailed explanation
         phone_count = len(result.get('phone', []))
         if phone_count == 0:
-            insights.append("No phone numbers found. This business may not publicly display contact phone numbers.")
+            # Provide detailed explanation of why no phone found
+            reasons = []
+            
+            # Check if website uses contact forms instead
+            if 'contact' in result.get('description', '').lower() or 'form' in result.get('description', '').lower():
+                reasons.append("Website appears to use contact forms instead of displaying phone numbers")
+            
+            # Check if emails are present (suggests intentional phone hiding)
+            if result.get('email'):
+                reasons.append("Email addresses found but no phone numbers - business may prefer email contact")
+            
+            # Check if social media is present
+            if result.get('social_media'):
+                reasons.append("Social media links found but no phone - business may prefer social media contact")
+            
+            # General reasons
+            if not reasons:
+                reasons.append("Phone numbers may be hidden behind login, JavaScript, or images")
+                reasons.append("Business may only display phone to verified visitors")
+                reasons.append("Website may require browser automation to extract phone numbers")
+            
+            insight = "⚠ No phone numbers found. Possible reasons: " + "; ".join(reasons) + "."
+            insights.append(insight)
+            insights.append("💡 Recommendation: Check 'Contact Us' page manually or use browser automation for JavaScript-rendered content.")
         elif phone_count == 1:
             insights.append("Single phone number found. Likely a small business or centralized contact system.")
         elif phone_count >= 10:
@@ -357,10 +380,16 @@ class UniversalBusinessScraper:
         # Overall data quality
         completeness = result.get('data_completeness_score', 0)
         if completeness >= 70:
-            insights.append("High data completeness. Excellent prospect for outreach.")
+            insights.append("✓ High data completeness. Excellent prospect for outreach.")
         elif completeness >= 40:
-            insights.append("Moderate data completeness. Additional research may be needed.")
+            insights.append("⚠ Moderate data completeness. Additional research may be needed.")
         else:
-            insights.append("Limited public data available. Business may prefer private communication channels.")
+            insights.append("⚠ Limited public data available. Business may prefer private communication channels or use advanced website protection.")
+        
+        # Automated calling readiness
+        if phone_count > 0:
+            insights.append("✓ READY FOR AUTOMATED CALLING: Phone number(s) available for voice outreach.")
+        else:
+            insights.append("✗ NOT READY FOR AUTOMATED CALLING: No phone numbers detected. Manual research required or use alternative contact methods.")
         
         return insights
