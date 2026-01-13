@@ -24,6 +24,7 @@ from ai_analysis_engine import HealthcareAIAnalyzer
 from autonomous_caller import AutonomousCallManager
 from human_ai_caller import HumanAICaller
 from multilingual_caller import MultilingualAICaller
+from retell_webhook_handler import webhook_handler
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -597,6 +598,62 @@ async def _process_analysis_job(job_id: str, business_data: Dict):
         jobs_db[job_id]['status'] = 'failed'
         jobs_db[job_id]['error'] = str(e)
         logger.error(f"Analysis job {job_id} failed: {str(e)}")
+
+
+@app.post("/api/v1/retell/webhook")
+async def retell_webhook(request: dict):
+    """
+    Retell AI webhook endpoint for handling function calls and events
+    
+    This endpoint receives:
+    - Function calls from the AI agent (e.g., send_payment_link)
+    - Call lifecycle events (started, ended)
+    
+    Args:
+        request: Webhook payload from Retell AI
+        
+    Returns:
+        Response data for Retell AI
+    """
+    try:
+        event_type = request.get("event")
+        
+        logger.info(f"Retell webhook received: {event_type}")
+        
+        if event_type == "function_call":
+            # Handle function calls from the agent
+            function_name = request.get("function_name")
+            parameters = request.get("parameters", {})
+            call_data = request.get("call", {})
+            
+            logger.info(f"Function call: {function_name} with params: {parameters}")
+            
+            result = webhook_handler.handle_function_call(
+                function_name=function_name,
+                parameters=parameters,
+                call_data=call_data
+            )
+            
+            return {
+                "response": result.get("message", "Function executed"),
+                "success": result.get("success", True)
+            }
+            
+        elif event_type == "call_started":
+            result = webhook_handler.handle_call_started(request.get("call", {}))
+            return result
+            
+        elif event_type == "call_ended":
+            result = webhook_handler.handle_call_ended(request.get("call", {}))
+            return result
+            
+        else:
+            logger.warning(f"Unknown webhook event: {event_type}")
+            return {"status": "unknown_event"}
+            
+    except Exception as e:
+        logger.error(f"Webhook error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/chamber-partnership")
