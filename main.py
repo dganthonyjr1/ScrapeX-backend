@@ -21,6 +21,7 @@ from resource_manager import resource_manager
 from ai_analysis_engine import HealthcareAIAnalyzer
 from autonomous_caller import AutonomousCallManager
 from human_ai_caller import HumanAICaller
+from multilingual_caller import MultilingualAICaller
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,6 +50,7 @@ batch_processor = BatchProcessor(batch_size=50, max_workers=5)
 analyzer = HealthcareAIAnalyzer()
 call_manager = AutonomousCallManager()
 human_caller = HumanAICaller()
+multilingual_caller = MultilingualAICaller()
 
 # Request/Response models
 class ScrapeRequest(BaseModel):
