@@ -5,7 +5,7 @@
 
 ## The Big Idea
 
-ScrapeX is an automated customer acquisition platform that taps into the largest networks of businesses in America: Chambers of Commerce and Tourism boards across all 50 states. It finds potential customers, extracts decision-maker contact information, and initiates conversations on behalf of any business.
+ScrapeX is a multi-lingual, automated customer acquisition platform that taps into the largest networks of businesses in America and around the world. It autonomously communicates in Spanish, French, Mandarin, Portuguese, and German, allowing businesses to reach a global audience and diverse communities within the United States.
 
 ---
 
@@ -121,7 +121,7 @@ ScrapeX is not just another software tool. It is a scalable, automated growth pl
 
 **The value proposition is undeniable.** ScrapeX provides a clear, measurable return on investment. Businesses that use ScrapeX can generate tens of thousands or even hundreds of thousands of dollars in new revenue by tapping into Chamber and tourism networks.
 
-**The technology is proven and production-ready.** ScrapeX is live, functional, and capable of processing hundreds of businesses per day. The platform is designed to scale safely and efficiently as demand grows.
+**The technology is proven and production-ready. The multi-lingual capability creates a powerful competitive moat that is difficult and expensive for rivals to replicate, justifying a premium valuation.** ScrapeX is live, functional, and capable of processing hundreds of businesses per day. The platform is designed to scale safely and efficiently as demand grows.
 
 **The timing is perfect.** Businesses are desperate for cost-effective ways to acquire new customers. Traditional advertising is becoming more expensive and less effective. ScrapeX offers a better solution at a fraction of the cost.
 
