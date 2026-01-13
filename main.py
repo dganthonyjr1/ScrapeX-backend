@@ -462,14 +462,75 @@ async def get_call_statistics():
     return stats
 
 
+# Retell AI call function
+async def _initiate_retell_call(business_name: str, phone_number: str) -> Dict:
+    """Initiate a call via Retell AI"""
+    retell_api_key = os.getenv('RETELL_API_KEY')
+    agent_id = os.getenv('RETELL_AGENT_ID', 'agent_05e8f725879b2997086400e39f')
+    from_number = os.getenv('RETELL_FROM_NUMBER', '+16099084403')
+    
+    headers = {
+        'Authorization': f'Bearer {retell_api_key}',
+        'Content-Type': 'application/json'
+    }
+    
+    call_config = {
+        'agent_id': agent_id,
+        'from_number': from_number,
+        'to_number': phone_number,
+        'metadata': {
+            'business_name': business_name,
+            'source': 'automated_scrape',
+            'timestamp': datetime.now().isoformat()
+        }
+    }
+    
+    response = requests.post(
+        'https://api.retellai.com/v2/create-phone-call',
+        headers=headers,
+        json=call_config
+    )
+    
+    if response.status_code == 201:
+        return response.json()
+    else:
+        raise Exception(f"Retell API error: {response.status_code} - {response.text}")
+
+
 # Background task functions
 async def _process_scrape_job(job_id: str, url: str, business_type: Optional[str] = None):
-    """Process scrape job in background"""
+    """Process scrape job in background with automated calling"""
     try:
+        # Scrape the business
         result = scraper.scrape_business(url, business_type)
         jobs_db[job_id]['status'] = 'completed'
         jobs_db[job_id]['result'] = result
         logger.info(f"Scrape job {job_id} completed")
+        
+        # Automatically initiate call if phone numbers found
+        phone_numbers = result.get('contact_info', {}).get('phone_numbers', [])
+        if phone_numbers:
+            first_phone = phone_numbers[0]
+            business_name = result.get('business_name', 'Unknown Business')
+            
+            logger.info(f"Initiating automated call to {first_phone} for {business_name}")
+            
+            # Initiate call via Retell AI
+            try:
+                call_result = await _initiate_retell_call(business_name, first_phone)
+                jobs_db[job_id]['call_initiated'] = True
+                jobs_db[job_id]['call_id'] = call_result.get('call_id')
+                jobs_db[job_id]['call_phone'] = first_phone
+                logger.info(f"Call initiated successfully: {call_result.get('call_id')}")
+            except Exception as call_error:
+                logger.error(f"Failed to initiate call: {str(call_error)}")
+                jobs_db[job_id]['call_initiated'] = False
+                jobs_db[job_id]['call_error'] = str(call_error)
+        else:
+            logger.warning(f"No phone numbers found for {url}, skipping automated call")
+            jobs_db[job_id]['call_initiated'] = False
+            jobs_db[job_id]['call_error'] = 'No phone numbers found'
+            
     except Exception as e:
         jobs_db[job_id]['status'] = 'failed'
         jobs_db[job_id]['error'] = str(e)
