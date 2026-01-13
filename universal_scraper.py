@@ -42,7 +42,8 @@ class UniversalBusinessScraper:
             'business_owner_name': None,
             'key_decision_makers': [],
             'services': [],
-            'data_completeness_score': 0
+            'data_completeness_score': 0,
+            'analysis_insights': []
         }
         
         try:
@@ -71,6 +72,9 @@ class UniversalBusinessScraper:
             
             # Calculate completeness
             result['data_completeness_score'] = self._calculate_completeness(result)
+            
+            # Generate analysis insights
+            result['analysis_insights'] = self._generate_insights(result)
             
             logger.info(f"Extraction complete: {result['data_completeness_score']}% complete")
             logger.info(f"Found: {len(result['phone'])} phones, {len(result['email'])} emails")
@@ -308,3 +312,55 @@ class UniversalBusinessScraper:
             score += 1
         
         return int((score / total) * 100)
+
+    def _generate_insights(self, result: Dict) -> List[str]:
+        """Generate analysis insights about the scraped data"""
+        insights = []
+        
+        # Phone analysis
+        phone_count = len(result.get('phone', []))
+        if phone_count == 0:
+            insights.append("No phone numbers found. This business may not publicly display contact phone numbers.")
+        elif phone_count == 1:
+            insights.append("Single phone number found. Likely a small business or centralized contact system.")
+        elif phone_count >= 10:
+            insights.append(f"Multiple phone numbers found ({phone_count} total). Indicates large organization with multiple departments.")
+        else:
+            insights.append(f"{phone_count} phone numbers found. Multiple contact points available for outreach.")
+        
+        # Email analysis
+        email_count = len(result.get('email', []))
+        if email_count == 0:
+            insights.append("No email addresses found. This business does not publicly display email contact information.")
+        elif email_count == 1:
+            insights.append("Single email address found. Primary contact point identified.")
+        else:
+            insights.append(f"{email_count} email addresses found. Multiple contact channels available.")
+        
+        # Social media analysis
+        social_count = len(result.get('social_media', {}))
+        if social_count == 0:
+            insights.append("No social media presence detected. Business may rely on traditional marketing channels.")
+        elif social_count >= 4:
+            platforms = ', '.join(result['social_media'].keys())
+            insights.append(f"Strong social media presence across {social_count} platforms ({platforms}). Active digital marketing strategy.")
+        else:
+            platforms = ', '.join(result['social_media'].keys())
+            insights.append(f"Social media presence on {social_count} platform(s): {platforms}.")
+        
+        # Address analysis
+        if result.get('address'):
+            insights.append(f"Physical location identified: {result['address'][0][:50]}...")
+        else:
+            insights.append("No physical address found. May be online-only or location not publicly displayed.")
+        
+        # Overall data quality
+        completeness = result.get('data_completeness_score', 0)
+        if completeness >= 70:
+            insights.append("High data completeness. Excellent prospect for outreach.")
+        elif completeness >= 40:
+            insights.append("Moderate data completeness. Additional research may be needed.")
+        else:
+            insights.append("Limited public data available. Business may prefer private communication channels.")
+        
+        return insights
