@@ -23,6 +23,8 @@ class IntegratedScrapingPipeline:
     1. Scrape directory to get list of businesses
     2. Scrape each individual business for detailed info
     3. Return comprehensive dataset ready for AI calling
+    
+    Note: For large directories (100+ businesses), use BatchProcessor instead
     """
 
     def __init__(self, max_workers: int = 5):

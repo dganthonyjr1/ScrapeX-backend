@@ -1,0 +1,247 @@
+{
+  "status": "success",
+  "directory_url": "https://www.tampabaychamber.com/membership/",
+  "directory_type": null,
+  "pages_scraped": 1,
+  "total_businesses_found": 5,
+  "businesses_scraped": 5,
+  "businesses": [
+    {
+      "business_name": "OurVision",
+      "website": "https://www.tampabaychamber.com/membership/index.php?src=membership&srctype=lister&pos=30,30,1293",
+      "phone": [
+        "(172) 918-7395",
+        "(729) 187-3953",
+        "(813) 228-7777"
+      ],
+      "address": null,
+      "category": "Search by Primary Category: AccountingAdvertisingBusiness ServiceConstructionEducationEmerge Individ",
+      "source": "structured_extraction",
+      "url": "https://www.tampabaychamber.com/membership/index.php?src=membership&srctype=lister&pos=30,30,1293",
+      "scraped_at": "2026-01-13T09:19:44.870317",
+      "scraping_method": "http_request",
+      "business_type": "Search by Primary Category: AccountingAdvertisingBusiness ServiceConstructionEducationEmerge Individ",
+      "email": [],
+      "hours": null,
+      "services": [],
+      "description": "The Tampa Bay Chamber envisions an engaged and inclusive community driven by business prosperity.",
+      "social_media": {
+        "facebook": "https://www.facebook.com/tampabaychamber/",
+        "twitter": "https://twitter.com/TB_Chamber",
+        "instagram": "https://www.instagram.com/tampabaychamber_/",
+        "linkedin": "https://www.linkedin.com/company/tampabaychamber"
+      },
+      "owner_info": {
+        "names": [],
+        "titles": [],
+        "emails": [],
+        "linkedin": [],
+        "phones": [],
+        "about_page": "pages/collegiate-leadership/"
+      },
+      "status": "success",
+      "manual_required": false,
+      "directory_listing": {
+        "business_name": "160 Driving Academy",
+        "website": "https://www.tampabaychamber.com/membership/index.php?src=membership&srctype=lister&pos=30,30,1293",
+        "phone": "1234567891",
+        "address": null,
+        "category": "Search by Primary Category: AccountingAdvertisingBusiness ServiceConstructionEducationEmerge Individ",
+        "source": "structured_extraction"
+      }
+    },
+    {
+      "business_name": "2552 E Fowler Ave \u00b7 2552 E Fowler Ave, Tampa, FL 33612",
+      "website": "https://www.google.com/maps/place/2552 E Fowler Avenue,+Tampa,+FL+33612/",
+      "phone": [
+        "(000) 000-0149",
+        "(002) 616-7692",
+        "(009) 999-9997",
+        "(026) 167-6083",
+        "(110) 836-6802"
+      ],
+      "address": null,
+      "category": "Education",
+      "source": "structured_extraction",
+      "url": "https://www.google.com/maps/place/2552 E Fowler Avenue,+Tampa,+FL+33612/",
+      "scraped_at": "2026-01-13T09:19:44.993814",
+      "scraping_method": "http_request",
+      "business_type": "Education",
+      "email": [],
+      "hours": null,
+      "services": [],
+      "description": "2552 E Fowler Ave, Tampa, FL 33612",
+      "social_media": {},
+      "owner_info": {
+        "names": [],
+        "titles": [],
+        "emails": [],
+        "linkedin": [],
+        "phones": []
+      },
+      "status": "success",
+      "manual_required": false,
+      "directory_listing": {
+        "business_name": "160 Driving Academy",
+        "website": "https://www.google.com/maps/place/2552 E Fowler Avenue,+Tampa,+FL+33612/",
+        "phone": null,
+        "address": null,
+        "category": "Education",
+        "source": "structured_extraction"
+      }
+    },
+    {
+      "business_name": "TAKE ADVANTAGE OF AN IN\u00a0DEMAND CAREER NOW!",
+      "website": "http://www.160drivingacademy.com",
+      "phone": [
+        "(013) 566-2774",
+        "(100) 527-3345",
+        "(106) 945-9178",
+        "(109) 092-6369",
+        "(109) 092-6513"
+      ],
+      "address": "Corporate\n\nTwo North Riverside Plaza, Suite 2100\nChicago,\r\n                        IL 60606\n\n\n(877) 745-2034",
+      "category": null,
+      "source": "link_extraction",
+      "url": "http://www.160drivingacademy.com",
+      "scraped_at": "2026-01-13T09:19:45.475996",
+      "scraping_method": "http_request",
+      "business_type": "insurance",
+      "email": [],
+      "hours": null,
+      "services": [],
+      "description": "Explore comprehensive CDL training at 160 Driving Academy, paving the way to a successful trucking career.",
+      "social_media": {
+        "facebook": "https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fwww.160drivingacademy.com%2foffers%2ftrucking-career%2f",
+        "twitter": "https://twitter.com/home?status=Thought%20you%20might%20like%20this http%3a%2f%2fwww.160drivingacademy.com%2foffers%2ftrucking-career%2f",
+        "instagram": "https://www.instagram.com/160drivingacademy/",
+        "linkedin": "https://www.linkedin.com/company/160-driving-academy/",
+        "youtube": "https://www.youtube.com/@160drivingacademy",
+        "tiktok": "https://www.tiktok.com/tagged/https%3a%2f%2fwww.160drivingacademy.com%2f"
+      },
+      "owner_info": {
+        "names": [
+          "Steve Gold",
+          "Driving Academy"
+        ],
+        "titles": [],
+        "emails": [],
+        "linkedin": [],
+        "phones": [],
+        "about_page": "/about-us/"
+      },
+      "status": "success",
+      "manual_required": false,
+      "directory_listing": {
+        "business_name": "http://www.160drivingacademy.com",
+        "website": "http://www.160drivingacademy.com",
+        "phone": null,
+        "address": null,
+        "category": null,
+        "source": "link_extraction"
+      }
+    },
+    {
+      "business_name": "17734 Bright Wheat Dr \u00b7 17734 Bright Wheat Dr, Lithia, FL 33547",
+      "website": "https://www.google.com/maps/place/17734 Bright Wheat Drive,+Lithia,+FL+33547/",
+      "phone": [
+        "(000) 000-0149",
+        "(002) 616-7692",
+        "(009) 999-9997",
+        "(020) 899-9532",
+        "(026) 167-6083"
+      ],
+      "address": null,
+      "category": null,
+      "source": "link_extraction",
+      "url": "https://www.google.com/maps/place/17734 Bright Wheat Drive,+Lithia,+FL+33547/",
+      "scraped_at": "2026-01-13T09:19:46.038475",
+      "scraping_method": "http_request",
+      "business_type": "general_business",
+      "email": [],
+      "hours": null,
+      "services": [],
+      "description": "Building",
+      "social_media": {},
+      "owner_info": {
+        "names": [],
+        "titles": [],
+        "emails": [],
+        "linkedin": [],
+        "phones": []
+      },
+      "status": "success",
+      "manual_required": false,
+      "directory_listing": {
+        "business_name": "Map",
+        "website": "https://www.google.com/maps/place/17734 Bright Wheat Drive,+Lithia,+FL+33547/",
+        "phone": null,
+        "address": null,
+        "category": null,
+        "source": "link_extraction"
+      }
+    },
+    {
+      "business_name": "Lead with Purpose. Coach with Impact",
+      "website": "http://2bonpurpose.com",
+      "phone": [
+        "(022) 333-7494",
+        "(113) 317-9780",
+        "(176) 764-7343",
+        "(201) 596-0785",
+        "(202) 246-8999"
+      ],
+      "address": "17734 Bright Wheat Drive, Lithia, FL 33547-4335",
+      "category": null,
+      "source": "link_extraction",
+      "url": "http://2bonpurpose.com",
+      "scraped_at": "2026-01-13T09:19:47.047033",
+      "scraping_method": "http_request",
+      "business_type": "general_business",
+      "email": [
+        "2bonpurpose@gmail.com",
+        "TOUCH2bonpurpose@gmail.com"
+      ],
+      "hours": null,
+      "services": [],
+      "description": "Welcome to Jonathan Armel's Life Coaching! I work with people to achieve optimal health and wellness.",
+      "social_media": {},
+      "owner_info": {
+        "names": [],
+        "titles": [],
+        "emails": [],
+        "linkedin": [],
+        "phones": [],
+        "about_page": "https://www.2bonpurpose.com/about"
+      },
+      "status": "success",
+      "manual_required": false,
+      "directory_listing": {
+        "business_name": "http://2bonpurpose.com",
+        "website": "http://2bonpurpose.com",
+        "phone": null,
+        "address": null,
+        "category": null,
+        "source": "link_extraction"
+      }
+    }
+  ],
+  "scraped_at": "2026-01-13T09:19:47.119470",
+  "summary": {
+    "total_businesses": 5,
+    "business_types": {
+      "Search by Primary Category: AccountingAdvertisingBusiness ServiceConstructionEducationEmerge Individ": 1,
+      "Education": 1,
+      "insurance": 1,
+      "general_business": 2
+    },
+    "businesses_with_owner_info": 1,
+    "businesses_with_email": 1,
+    "businesses_with_phone": 5,
+    "data_completeness": {
+      "owner_info": "20.0%",
+      "email": "20.0%",
+      "phone": "100.0%"
+    }
+  }
+}

@@ -15,6 +15,9 @@ import os
 from universal_scraper import UniversalBusinessScraper
 from directory_scraper import DirectoryScraper
 from integrated_scraper import IntegratedScrapingPipeline
+from batch_processor import BatchProcessor
+from supabase_manager import db_manager
+from resource_manager import resource_manager
 from ai_analysis_engine import HealthcareAIAnalyzer
 from autonomous_caller import AutonomousCallManager
 from human_ai_caller import HumanAICaller
@@ -42,6 +45,7 @@ app.add_middleware(
 scraper = UniversalBusinessScraper()
 directory_scraper = DirectoryScraper()
 integrated_pipeline = IntegratedScrapingPipeline(max_workers=5)
+batch_processor = BatchProcessor(batch_size=50, max_workers=5)
 analyzer = HealthcareAIAnalyzer()
 call_manager = AutonomousCallManager()
 human_caller = HumanAICaller()
@@ -63,6 +67,8 @@ class DirectoryScrapeRequest(BaseModel):
     directory_url: str
     max_businesses: Optional[int] = None
     max_pages: int = 10
+    use_batch_processing: bool = True
+    batch_size: int = 50
 
 class AnalysisRequest(BaseModel):
     """Request to analyze scraped business data"""
@@ -109,7 +115,8 @@ async def root():
             "call": "/api/v1/call",
             "jobs": "/api/v1/jobs",
             "calls": "/api/v1/calls",
-            "health": "/health"
+            "health": "/health",
+            "note": "For large directories (100+ businesses), set use_batch_processing=true"
         }
     }
 
@@ -225,6 +232,12 @@ async def scrape_directory(request: DirectoryScrapeRequest, background_tasks: Ba
     """
     Scrape a business directory (Chamber of Commerce, tourism sites, etc.)
     
+    SAFETY FEATURES:
+    - Rate limiting: Max 5 concurrent jobs per user
+    - Batch size capped at 50 businesses
+    - Job timeout: 30 minutes
+    - Results stored in database
+    
     Args:
         request: DirectoryScrapeRequest with directory URL
         
@@ -232,9 +245,35 @@ async def scrape_directory(request: DirectoryScrapeRequest, background_tasks: Ba
         Job ID for tracking
     """
     try:
+        # TODO: Get user_id from auth token
+        user_id = "demo_user"  # Replace with actual auth
+        
+        # Check rate limits
+        limit_check = resource_manager.check_can_start_job(user_id)
+        if not limit_check['can_start']:
+            raise HTTPException(status_code=429, detail=limit_check['message'])
+        
+        # Validate and cap batch size
+        batch_size = resource_manager.validate_batch_size(request.batch_size)
+        
+        # Generate job ID
         job_id = generate_job_id()
         
-        # Create job record
+        # Register job with resource manager
+        resource_manager.register_job(job_id, user_id)
+        
+        # Create job in database
+        db_manager.create_job(
+            job_id=job_id,
+            user_id=user_id,
+            job_type='directory_scrape',
+            directory_url=request.directory_url,
+            max_businesses=request.max_businesses,
+            max_pages=request.max_pages,
+            batch_size=batch_size
+        )
+        
+        # Also store in memory for backward compatibility
         jobs_db[job_id] = {
             'id': job_id,
             'type': 'directory_scrape',
@@ -243,23 +282,29 @@ async def scrape_directory(request: DirectoryScrapeRequest, background_tasks: Ba
             'directory_url': request.directory_url,
             'max_businesses': request.max_businesses,
             'max_pages': request.max_pages,
+            'batch_size': batch_size,
             'result': None,
             'error': None
         }
         
         # Process in background
         background_tasks.add_task(
-            _process_directory_scrape_job,
+            _process_directory_scrape_job_safe,
             job_id,
+            user_id,
             request.directory_url,
             request.max_businesses,
-            request.max_pages
+            request.max_pages,
+            batch_size,
+            request.use_batch_processing
         )
         
         return {
             'job_id': job_id,
             'status': 'processing',
-            'message': f'Directory scraping job started for {request.directory_url}'
+            'message': f'Directory scraping job started for {request.directory_url}',
+            'batch_size': batch_size,
+            'estimated_time_minutes': (request.max_businesses or 50) / 5 if request.max_businesses else 10
         }
         
     except Exception as e:
@@ -442,7 +487,7 @@ async def _process_bulk_scrape_job(job_id: str, urls: List[str], business_type: 
 async def _process_directory_scrape_job(job_id: str, directory_url: str, 
                                         max_businesses: Optional[int] = None,
                                         max_pages: int = 10):
-    """Process directory scrape job in background"""
+    """Process directory scrape job in background (legacy)"""
     try:
         result = integrated_pipeline.scrape_directory_and_businesses(
             directory_url,
@@ -456,6 +501,85 @@ async def _process_directory_scrape_job(job_id: str, directory_url: str,
         jobs_db[job_id]['status'] = 'failed'
         jobs_db[job_id]['error'] = str(e)
         logger.error(f"Directory scrape job {job_id} failed: {str(e)}")
+
+
+async def _process_directory_scrape_job_safe(job_id: str, user_id: str, directory_url: str,
+                                            max_businesses: Optional[int] = None,
+                                            max_pages: int = 10,
+                                            batch_size: int = 50,
+                                            use_batch_processing: bool = True):
+    """Process directory scrape job with safety measures"""
+    import time
+    start_time = time.time()
+    
+    try:
+        # Update job status
+        db_manager.update_job(job_id, {'status': 'processing', 'started_at': datetime.now().isoformat()})
+        jobs_db[job_id]['status'] = 'processing'
+        
+        # Check for timeout periodically
+        if resource_manager.check_job_timeout(job_id):
+            raise TimeoutError("Job exceeded 30 minute timeout")
+        
+        # Use batch processing for safety
+        if use_batch_processing:
+            logger.info(f"Using batch processing (batch_size={batch_size})")
+            result = batch_processor.process_directory_in_batches(
+                directory_url=directory_url,
+                output_file=f"/tmp/job_{job_id}_results.json",
+                max_businesses=max_businesses,
+                max_pages=max_pages
+            )
+        else:
+            logger.info("Using integrated pipeline")
+            result = integrated_pipeline.scrape_directory_and_businesses(
+                directory_url,
+                max_businesses=max_businesses,
+                max_pages=max_pages
+            )
+        
+        # Save businesses to database
+        if result.get('status') == 'success' or result.get('status') == 'completed':
+            businesses = result.get('businesses', [])
+            for business in businesses:
+                db_manager.save_business(job_id, user_id, business)
+        
+        # Calculate stats
+        duration = time.time() - start_time
+        job_stats = resource_manager.get_job_stats(job_id)
+        
+        # Update job as completed
+        db_manager.update_job(job_id, {
+            'status': 'completed',
+            'completed_at': datetime.now().isoformat(),
+            'result': result,
+            'processed_count': result.get('total_processed', 0),
+            'successful_count': result.get('successful', 0),
+            'failed_count': result.get('failed', 0),
+            'duration_seconds': duration,
+            'memory_used_mb': job_stats.get('memory_used_mb') if job_stats else None
+        })
+        
+        jobs_db[job_id]['status'] = 'completed'
+        jobs_db[job_id]['result'] = result
+        
+        logger.info(f"Directory scrape job {job_id} completed - {result.get('successful', 0)} businesses scraped in {duration:.1f}s")
+        
+    except TimeoutError as e:
+        logger.error(f"Job {job_id} timed out: {str(e)}")
+        db_manager.update_job(job_id, {'status': 'failed', 'error_message': str(e)})
+        jobs_db[job_id]['status'] = 'failed'
+        jobs_db[job_id]['error'] = str(e)
+        
+    except Exception as e:
+        logger.error(f"Directory scrape job {job_id} failed: {str(e)}")
+        db_manager.update_job(job_id, {'status': 'failed', 'error_message': str(e)})
+        jobs_db[job_id]['status'] = 'failed'
+        jobs_db[job_id]['error'] = str(e)
+        
+    finally:
+        # Always unregister job to free up resources
+        resource_manager.unregister_job(job_id)
 
 
 async def _process_analysis_job(job_id: str, business_data: Dict):

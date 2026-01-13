@@ -1,0 +1,492 @@
+{
+  "directory_url": "https://www.tampabaychamber.com/membership/",
+  "directory_type": "chamber_of_commerce",
+  "scraped_at": "2026-01-13T09:19:07.494581",
+  "scraping_method": "http_request",
+  "businesses": [
+    {
+      "business_name": "160 Driving Academy",
+      "website": "https://www.tampabaychamber.com/membership/index.php?src=membership&srctype=lister&pos=30,30,1293",
+      "phone": "1234567891",
+      "address": null,
+      "category": "Search by Primary Category: AccountingAdvertisingBusiness ServiceConstructionEducationEmerge Individ",
+      "source": "structured_extraction"
+    },
+    {
+      "business_name": "160 Driving Academy",
+      "website": "https://www.google.com/maps/place/2552 E Fowler Avenue,+Tampa,+FL+33612/",
+      "phone": null,
+      "address": null,
+      "category": "Education",
+      "source": "structured_extraction"
+    },
+    {
+      "business_name": "http://www.160drivingacademy.com",
+      "website": "http://www.160drivingacademy.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/17734 Bright Wheat Drive,+Lithia,+FL+33547/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://2bonpurpose.com",
+      "website": "http://2bonpurpose.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/222 22nd Street S.,+St. Petersburg,+FL+33712/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.3dbrewing.com",
+      "website": "http://www.3dbrewing.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/14330 N Dale Mabry Hwy,+Tampa,+FL+33618/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://www.4rsmokehouse.com/",
+      "website": "https://www.4rsmokehouse.com/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/1715 Lithia Pinecrest Rd. ,+Brandon,+FL+33511/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.akidsplacetb.org",
+      "website": "http://www.akidsplacetb.org",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/4910 Carranza Court,+Tampa,+FL+33616/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.aplus-staffing.com",
+      "website": "http://www.aplus-staffing.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/400 N. Ashley Drive,+Tampa,+FL+33602/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.a-lign.com",
+      "website": "http://www.a-lign.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/14502 N. Dale Mabry Hwy.,+Tampa,+FL+33618/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://aprillewis.com/",
+      "website": "https://aprillewis.com/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/716 Renellie Drive,+Tampa,+FL+33609/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.admorgan.com",
+      "website": "http://www.admorgan.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/1516 E. 8th Avenue,+Tampa,+FL+33605/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.ajarango.com",
+      "website": "http://www.ajarango.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/201 N Armenia Ave,+Tampa,+FL+33609/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.arsavage.com",
+      "website": "http://www.arsavage.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/100 2nd Ave. South,+St. Petersburg,+FL+33701/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://aecollaborative.net/",
+      "website": "http://aecollaborative.net/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/3501 Bessie Coleman Blvd,+Tampa,+FL+33630/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://tampabayjanitors.com/",
+      "website": "https://tampabayjanitors.com/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/915 N Franklin St,+Tampa,+FL+33602/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://a5inc.com",
+      "website": "https://a5inc.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/777 S. Harbour Island Blvd.,+Tampa,+FL+33602/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/792 W Lumsden Road,+Brandon,+FL+33511/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.abaondemand.com",
+      "website": "http://www.abaondemand.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/2921 N. 29th Street,+Tampa,+FL+33605/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.abebrown.org",
+      "website": "http://www.abebrown.org",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/1220 Ogden Road,+Venice,+FL+34285/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.absolutealuminum.com",
+      "website": "http://www.absolutealuminum.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/1228 E. 7th Ave,+Tampa,+FL+33605/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://absolutemarketingsolutions.com/",
+      "website": "https://absolutemarketingsolutions.com/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/2331 Collier Pkwy.,+Land O' Lakes,+FL+34639/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.academyatthelakes.org",
+      "website": "http://www.academyatthelakes.org",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/12301 40th Street N,+Clearwater,+FL+33762/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.academybus.com",
+      "website": "http://www.academybus.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/140 Fountain Pkwy,+St. Petersburg,+FL +33716/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.accenture.com",
+      "website": "http://www.accenture.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/2115 N 22nd Street,+Tampa,+FL+33605/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://www.actuatemedia.com",
+      "website": "https://www.actuatemedia.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/311 W. Fletcher Avenue,+Tampa,+FL+33612/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.adcockfinancial.com",
+      "website": "http://www.adcockfinancial.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/4800 Deerwood Campus Pkwy,+Jacksonville,+FL+32246/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://www.adecco.com/",
+      "website": "https://www.adecco.com/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://www.adlinc.com",
+      "website": "http://www.adlinc.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/12001 US HWY 41 S,+Gibsonton,+FL+33534/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://advancedautoair.com",
+      "website": "http://advancedautoair.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/2437 S 8th Street,+Tampa,+FL+33619/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "http://advancedmhs.com",
+      "website": "http://advancedmhs.com",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/14055 Riveredge Drive,+Tampa,+FL+33637/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://www.adventhealth.com/",
+      "website": "https://www.adventhealth.com/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Map",
+      "website": "https://www.google.com/maps/place/7001 N. Dale Mabry Hwy.,+Tampa,+FL+33614/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "https://www.floridahospital.com/carrollwood/occupational-health",
+      "website": "https://www.floridahospital.com/carrollwood/occupational-health",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    },
+    {
+      "business_name": "Website & Software by Accrisoft",
+      "website": "https://www.accrisoft.com/markets-we-serve/chambers/",
+      "phone": null,
+      "address": null,
+      "category": null,
+      "source": "link_extraction"
+    }
+  ],
+  "total_found": 60,
+  "pagination_urls": [],
+  "has_more_pages": false,
+  "status": "success"
+}
