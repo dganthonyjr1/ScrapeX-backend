@@ -47,6 +47,7 @@ app.add_middleware(
 )
 
 # Initialize services
+# Version: 2.0 - Automated Calling with Universal Scraper
 scraper = UniversalBusinessScraper()
 directory_scraper = DirectoryScraper()
 integrated_pipeline = IntegratedScrapingPipeline(max_workers=5)
