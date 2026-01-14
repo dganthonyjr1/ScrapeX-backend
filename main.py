@@ -142,6 +142,19 @@ async def health_check():
     }
 
 
+@app.get("/debug")
+async def debug_info():
+    """Debug endpoint to show what's actually loaded"""
+    return {
+        "scraper_class": scraper.__class__.__name__,
+        "scraper_module": scraper.__class__.__module__,
+        "scraper_file": scraper.__class__.__module__.__file__ if hasattr(scraper.__class__.__module__, '__file__') else "unknown",
+        "scraper_methods": [m for m in dir(scraper) if not m.startswith('_')],
+        "git_commit": "c6bd3f231b0da6681afa019b07b477a89dc9f5c7",
+        "timestamp": datetime.now().isoformat()
+    }
+
+
 @app.post("/api/v1/scrape")
 async def scrape_business(request: ScrapeRequest, background_tasks: BackgroundTasks):
     """
