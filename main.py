@@ -544,19 +544,28 @@ async def _process_scrape_job(job_id: str, url: str, business_type: Optional[str
             first_phone = phone_numbers[0]
             business_name = result.get('business_name', 'Unknown Business')
             
-            logger.info(f"Initiating automated call to {first_phone} for {business_name}")
+            # Check if automatic calling is enabled
+            enable_auto_calling = os.getenv('ENABLE_AUTO_CALLING', 'false').lower() == 'true'
             
-            # Initiate call via Retell AI
-            try:
-                call_result = await _initiate_retell_call(business_name, first_phone)
-                jobs_db[job_id]['call_initiated'] = True
-                jobs_db[job_id]['call_id'] = call_result.get('call_id')
-                jobs_db[job_id]['call_phone'] = first_phone
-                logger.info(f"Call initiated successfully: {call_result.get('call_id')}")
-            except Exception as call_error:
-                logger.error(f"Failed to initiate call: {str(call_error)}")
+            if enable_auto_calling:
+                logger.info(f"Initiating automated call to {first_phone} for {business_name}")
+                
+                # Initiate call via Retell AI
+                try:
+                    call_result = await _initiate_retell_call(business_name, first_phone)
+                    jobs_db[job_id]['call_initiated'] = True
+                    jobs_db[job_id]['call_id'] = call_result.get('call_id')
+                    jobs_db[job_id]['call_phone'] = first_phone
+                    logger.info(f"Call initiated successfully: {call_result.get('call_id')}")
+                except Exception as call_error:
+                    logger.error(f"Failed to initiate call: {str(call_error)}")
+                    jobs_db[job_id]['call_initiated'] = False
+                    jobs_db[job_id]['call_error'] = str(call_error)
+            else:
+                logger.info(f"Auto-calling disabled. Phone number found: {first_phone}")
                 jobs_db[job_id]['call_initiated'] = False
-                jobs_db[job_id]['call_error'] = str(call_error)
+                jobs_db[job_id]['call_phone'] = first_phone
+                jobs_db[job_id]['call_error'] = 'Auto-calling disabled via ENABLE_AUTO_CALLING=false'
         else:
             logger.warning(f"No phone numbers found for {url}, skipping automated call")
             jobs_db[job_id]['call_initiated'] = False
