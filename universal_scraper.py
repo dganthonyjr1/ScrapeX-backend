@@ -26,6 +26,7 @@ class UniversalBusinessScraper:
         
     def _find_contact_page(self, soup: BeautifulSoup, base_url: str) -> str:
         """Find the contact page URL from homepage"""
+        logger.info(f"Searching for contact page on {base_url}")
         # Search all links
         for link in soup.find_all('a', href=True):
             href = link['href'].lower()
@@ -35,9 +36,10 @@ class UniversalBusinessScraper:
             if 'contact' in href or 'contact' in link_text:
                 # Convert to absolute URL
                 contact_url = urljoin(base_url, link['href'])
-                logger.info(f"Found contact page: {contact_url}")
+                logger.info(f"✓ Found contact page: {contact_url} (link text: '{link_text}', href: '{link['href']}')")
                 return contact_url
         
+        logger.warning(f"No contact page found on {base_url}")
         return None
         
     def scrape_business(self, url: str, business_type: str = None) -> Dict:
