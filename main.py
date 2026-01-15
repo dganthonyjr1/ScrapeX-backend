@@ -22,7 +22,7 @@ from batch_processor import BatchProcessor
 from supabase_manager import db_manager
 from resource_manager import resource_manager
 from ai_analysis_engine import HealthcareAIAnalyzer
-from autonomous_caller import AutonomousCallManager
+# Removed: from autonomous_caller import AutonomousCallManager - Using Retell AI directly
 from human_ai_caller import HumanAICaller
 from multilingual_caller import MultilingualAICaller
 from retell_webhook_handler import webhook_handler
@@ -53,7 +53,7 @@ directory_scraper = DirectoryScraper()
 integrated_pipeline = IntegratedScrapingPipeline(max_workers=5)
 batch_processor = BatchProcessor(batch_size=50, max_workers=5)
 analyzer = HealthcareAIAnalyzer()
-call_manager = AutonomousCallManager()
+# Removed: call_manager = AutonomousCallManager() - Using Retell AI directly
 human_caller = HumanAICaller()
 multilingual_caller = MultilingualAICaller()
 
@@ -387,18 +387,10 @@ async def trigger_call(request: CallRequest, background_tasks: BackgroundTasks):
         Call initiation response
     """
     try:
-        # Generate call script
-        script = analyzer.generate_call_script({
-            'facility_name': request.facility_name,
-            'analysis': request.analysis_data
-        })
-        
-        # Trigger call
-        result = call_manager.trigger_call(
-            facility_name=request.facility_name,
-            phone_number=request.phone_number,
-            analysis=request.analysis_data,
-            call_script=script
+        # Trigger call via Retell AI
+        result = await _initiate_retell_call(
+            business_name=request.facility_name,
+            phone_number=request.phone_number
         )
         
         return result
