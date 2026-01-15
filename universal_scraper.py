@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import Dict, List
 import logging
 from dns_fix import configure_dns_session
+from smart_phone_extractor import extract_smart_phones
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -86,20 +87,21 @@ class UniversalBusinessScraper:
                     contact_soup = BeautifulSoup(contact_response.content, 'html.parser')
                     
                     # Extract phone numbers from contact page (prioritized)
-                    contact_phones = self._extract_phones(contact_soup, contact_response.text)
+                    contact_phones = extract_smart_phones(contact_soup, contact_response.text, is_contact_page=True)
                     if contact_phones:
-                        logger.info(f"Found {len(contact_phones)} phones on contact page")
+                        logger.info(f"Found {len(contact_phones)} phones on contact page (prioritized)")
+                        logger.info(f"Primary phone: {contact_phones[0]}")
                         result['phone'] = contact_phones
                     else:
                         # Fallback to homepage phones
-                        result['phone'] = self._extract_phones(soup, response.text)
+                        result['phone'] = extract_smart_phones(soup, response.text, is_contact_page=False)
                 except Exception as e:
                     logger.warning(f"Could not scrape contact page: {e}")
                     # Fallback to homepage phones
-                    result['phone'] = self._extract_phones(soup, response.text)
+                    result['phone'] = extract_smart_phones(soup, response.text, is_contact_page=False)
             else:
                 # No contact page found, use homepage
-                result['phone'] = self._extract_phones(soup, response.text)
+                result['phone'] = extract_smart_phones(soup, response.text, is_contact_page=False)
             
             # Extract emails
             result['email'] = self._extract_emails(soup, response.text)
