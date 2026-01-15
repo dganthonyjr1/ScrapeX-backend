@@ -468,6 +468,27 @@ async def get_call_statistics():
     return stats
 
 
+# Phone number formatting function
+def format_phone_to_e164(phone: str) -> str:
+    """Convert phone number to E.164 format (+1XXXXXXXXXX)"""
+    import re
+    # Remove all non-digit characters
+    digits = re.sub(r'\D', '', phone)
+    
+    # If it starts with 1 and has 11 digits, add +
+    if len(digits) == 11 and digits.startswith('1'):
+        return f'+{digits}'
+    # If it has 10 digits, add +1
+    elif len(digits) == 10:
+        return f'+1{digits}'
+    # If it already starts with + return as is
+    elif phone.startswith('+'):
+        return phone
+    else:
+        # Return as is and let Retell reject if invalid
+        return phone
+
+
 # Retell AI call function
 async def _initiate_retell_call(business_name: str, phone_number: str) -> Dict:
     """Initiate a call via Retell AI"""
@@ -480,10 +501,13 @@ async def _initiate_retell_call(business_name: str, phone_number: str) -> Dict:
         'Content-Type': 'application/json'
     }
     
+    # Format phone number to E.164
+    formatted_phone = format_phone_to_e164(phone_number)
+    
     call_config = {
         'agent_id': agent_id,
         'from_number': from_number,
-        'to_number': phone_number,
+        'to_number': formatted_phone,
         'metadata': {
             'business_name': business_name,
             'source': 'automated_scrape',
