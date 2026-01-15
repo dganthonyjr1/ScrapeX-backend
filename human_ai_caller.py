@@ -5,7 +5,7 @@ Generates natural, conversational scripts that don't sound like sales pitches
 
 import json
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
