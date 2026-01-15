@@ -26,20 +26,17 @@ class UniversalBusinessScraper:
         
     def _find_contact_page(self, soup: BeautifulSoup, base_url: str) -> str:
         """Find the contact page URL from homepage"""
-        contact_keywords = ['contact', 'contact-us', 'contact_us', 'contactus', 'get-in-touch', 'reach-us']
-        
         # Search all links
         for link in soup.find_all('a', href=True):
             href = link['href'].lower()
             link_text = link.get_text().lower().strip()
             
-            # Check if link contains contact keywords
-            for keyword in contact_keywords:
-                if keyword in href or keyword in link_text:
-                    # Convert to absolute URL
-                    contact_url = urljoin(base_url, link['href'])
-                    logger.info(f"Found contact page: {contact_url}")
-                    return contact_url
+            # Check if link or text contains 'contact'
+            if 'contact' in href or 'contact' in link_text:
+                # Convert to absolute URL
+                contact_url = urljoin(base_url, link['href'])
+                logger.info(f"Found contact page: {contact_url}")
+                return contact_url
         
         return None
         
