@@ -24,6 +24,25 @@ class UniversalBusinessScraper:
         self.session = configure_dns_session()
         self.timeout = 30
         
+    def _find_contact_page(self, soup: BeautifulSoup, base_url: str) -> str:
+        """Find the contact page URL from homepage"""
+        contact_keywords = ['contact', 'contact-us', 'contact_us', 'contactus', 'get-in-touch', 'reach-us']
+        
+        # Search all links
+        for link in soup.find_all('a', href=True):
+            href = link['href'].lower()
+            link_text = link.get_text().lower().strip()
+            
+            # Check if link contains contact keywords
+            for keyword in contact_keywords:
+                if keyword in href or keyword in link_text:
+                    # Convert to absolute URL
+                    contact_url = urljoin(base_url, link['href'])
+                    logger.info(f"Found contact page: {contact_url}")
+                    return contact_url
+        
+        return None
+        
     def scrape_business(self, url: str, business_type: str = None) -> Dict:
         """
         Scrape business data from website
@@ -55,8 +74,30 @@ class UniversalBusinessScraper:
             # Extract business name
             result['business_name'] = self._extract_business_name(soup, url)
             
-            # Extract phone numbers
-            result['phone'] = self._extract_phones(soup, response.text)
+            # Try to find and scrape contact page for better phone numbers
+            contact_url = self._find_contact_page(soup, url)
+            if contact_url and contact_url != url:
+                try:
+                    logger.info(f"Scraping contact page: {contact_url}")
+                    contact_response = self.session.get(contact_url, timeout=self.timeout)
+                    contact_response.raise_for_status()
+                    contact_soup = BeautifulSoup(contact_response.content, 'html.parser')
+                    
+                    # Extract phone numbers from contact page (prioritized)
+                    contact_phones = self._extract_phones(contact_soup, contact_response.text)
+                    if contact_phones:
+                        logger.info(f"Found {len(contact_phones)} phones on contact page")
+                        result['phone'] = contact_phones
+                    else:
+                        # Fallback to homepage phones
+                        result['phone'] = self._extract_phones(soup, response.text)
+                except Exception as e:
+                    logger.warning(f"Could not scrape contact page: {e}")
+                    # Fallback to homepage phones
+                    result['phone'] = self._extract_phones(soup, response.text)
+            else:
+                # No contact page found, use homepage
+                result['phone'] = self._extract_phones(soup, response.text)
             
             # Extract emails
             result['email'] = self._extract_emails(soup, response.text)
