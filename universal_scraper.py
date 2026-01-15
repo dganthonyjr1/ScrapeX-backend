@@ -29,11 +29,14 @@ class UniversalBusinessScraper:
         logger.info(f"Searching for contact page on {base_url}")
         # Search all links
         for link in soup.find_all('a', href=True):
-            href = link['href'].lower()
+            href = link.get('href', '')
+            if not href:
+                continue
+            href_lower = href.lower()
             link_text = link.get_text().lower().strip()
             
             # Check if link or text contains 'contact'
-            if 'contact' in href or 'contact' in link_text:
+            if 'contact' in href_lower or 'contact' in link_text:
                 # Convert to absolute URL
                 contact_url = urljoin(base_url, link['href'])
                 logger.info(f"✓ Found contact page: {contact_url} (link text: '{link_text}', href: '{link['href']}')")
